@@ -1,0 +1,32 @@
+{
+  "name": "sb--v2",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler pages dev --local -- vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "seed:eod-reports": "node scripts/seedEODReports.js",
+    "seed:med-runs": "node scripts/seedMedRuns.js",
+    "seed:rounds-history": "node scripts/seedRoundsHistory.js",
+    "seed:missing-collections": "node scripts/seedMissingCollections.js"
+  },
+  "dependencies": {
+    "firebase": "^12.15.0",
+    "pinia": "^3.0.4",
+    "qrcode.vue": "^3.10.0",
+    "vue": "^3.5.38",
+    "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.1",
+    "@vitejs/plugin-vue": "^6.0.7",
+    "autoprefixer": "^10.5.2",
+    "firebase-admin": "^14.1.0",
+    "postcss": "^8.5.15",
+    "tailwindcss": "^4.3.1",
+    "vite": "^8.1.0",
+    "vite-plugin-pwa": "^1.3.0"
+  }
+}

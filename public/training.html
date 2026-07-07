@@ -1,0 +1,2538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>St. Francis Rescue & Sanctuary - Interactive Volunteer Training</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    :root {
+      --bg-primary: #070a13;
+      --bg-secondary: #0f1526;
+      --bg-tertiary: #1b233d;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent-gold: #f59e0b;
+      --accent-gold-glow: rgba(245, 158, 11, 0.25);
+      --accent-emerald: #10b981;
+      --accent-emerald-glow: rgba(16, 185, 129, 0.25);
+      --accent-rose: #f43f5e;
+      --accent-rose-glow: rgba(244, 63, 94, 0.2);
+      --accent-cyan: #06b6d4;
+      --accent-cyan-glow: rgba(6, 182, 212, 0.25);
+      --border-color: rgba(148, 163, 184, 0.12);
+      --radius-sm: 6px;
+      --radius-md: 12px;
+      --radius-lg: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 80px;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      letter-spacing: -0.02em;
+    }
+
+    /* Header Styling */
+    header {
+      background-color: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(8px);
+    }
+
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    @media (min-width: 768px) {
+      .header-container {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-container {
+      background-color: #ffffff;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+      border: 2px solid var(--accent-gold);
+      padding: 1px;
+    }
+
+    .brand-text h1 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      background: linear-gradient(to right, #fef08a, #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-text p {
+      font-size: 0.85rem;
+      color: #fbd58d; /* Warm glowing desert-sand color for readability */
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    .hud {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badge-pill {
+      background-color: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: var(--accent-gold);
+      padding: 6px 14px;
+      border-radius: 99px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 0 15px var(--accent-gold-glow);
+    }
+
+    .badge-pill.success {
+      background-color: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--accent-emerald);
+      box-shadow: 0 0 15px var(--accent-emerald-glow);
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 1.5rem auto;
+      padding: 0 1rem;
+    }
+
+    /* Navigation Tabs */
+    .tabs-nav {
+      display: none;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+      background-color: var(--bg-secondary);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text-secondary);
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: 12px 6px;
+      border-radius: calc(var(--radius-md) - 2px);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    @media (min-width: 640px) {
+      .tab-btn {
+        font-size: 0.95rem;
+        padding: 14px 18px;
+      }
+    }
+
+    .tab-btn.active {
+      background-color: var(--bg-tertiary);
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+      border-bottom: 2px solid var(--accent-gold);
+    }
+
+    /* Tab Content panels */
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Welcome & Storyboard Section */
+    .welcome-card {
+      background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(15, 21, 38, 0.7) 100%);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media (min-width: 768px) {
+      .welcome-card {
+        padding: 2.5rem;
+      }
+    }
+
+    .welcome-badge {
+      display: inline-block;
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: var(--accent-gold);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .welcome-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+
+    @media (min-width: 768px) {
+      .welcome-title {
+        font-size: 2.4rem;
+      }
+    }
+
+    .welcome-desc {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      max-width: 800px;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Written Storyboard Nodes */
+    .storyboard-title-row {
+      border-top: 1px solid var(--border-color);
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .storyboard-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+
+    @media (min-width: 768px) {
+      .storyboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .storyboard-card {
+      background-color: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .storyboard-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .scene-badge {
+      background-color: var(--accent-cyan);
+      color: #000;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .chapter-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--accent-gold);
+    }
+
+    .storyboard-text-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 4px;
+    }
+
+    .lbl-vis { color: var(--accent-cyan); }
+    .lbl-aud { color: var(--accent-gold); }
+    .lbl-scr { color: var(--accent-emerald); }
+
+    .storyboard-p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .callout-screen-box {
+      background-color: #000;
+      border: 1px dashed var(--border-color);
+      border-radius: 6px;
+      padding: 10px;
+      color: #fef08a;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    /* Toast styles */
+    .xp-toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: linear-gradient(135deg, var(--bg-tertiary), #1e293b);
+      border: 1px solid var(--accent-gold);
+      color: var(--accent-gold);
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      padding: 12px 24px;
+      border-radius: 99px;
+      z-index: 1000;
+      box-shadow: 0 10px 30px rgba(245, 158, 11, 0.2), 0 0 15px var(--accent-gold-glow);
+      opacity: 0;
+      transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
+    }
+
+    .xp-toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* Progress Banner */
+    .progress-banner {
+      background: linear-gradient(90deg, #0f1526 0%, #172554 100%);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+    }
+
+    @media (min-width: 768px) {
+      .progress-banner {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+
+    .progress-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .progress-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .progress-numbers {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    .progress-bar-container {
+      flex: 1;
+      max-width: 500px;
+      background-color: var(--bg-primary);
+      height: 12px;
+      border-radius: 99px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-emerald));
+      width: 0%;
+      border-radius: 99px;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+    }
+
+    /* Quest Split Screen Layout */
+    .quest-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 1024px) {
+      .quest-layout {
+        grid-template-columns: 320px 1fr;
+      }
+    }
+
+    /* Quest Sidebar list of modules */
+    .quest-sidebar {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 380px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(245, 158, 11, 0.4) rgba(255, 255, 255, 0.05);
+    }
+
+    @media (min-width: 1024px) {
+      .quest-sidebar {
+        max-height: calc(100vh - 220px);
+        min-height: 540px;
+        position: sticky;
+        top: 100px;
+      }
+    }
+
+    /* High-contrast beautiful custom scrollbars for the sidebar */
+    .quest-sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .quest-sidebar::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: var(--radius-md);
+    }
+
+    .quest-sidebar::-webkit-scrollbar-thumb {
+      background-color: rgba(245, 158, 11, 0.35);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(245, 158, 11, 0.1);
+    }
+
+    .quest-sidebar::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(245, 158, 11, 0.55);
+    }
+
+    .step-card {
+      background: transparent;
+      border: 1px solid transparent;
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+      width: 100%;
+      transition: all 0.2s ease;
+      color: var(--text-primary);
+    }
+
+    .step-card:hover {
+      background: rgba(255, 255, 255, 0.02);
+      border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .step-card.active {
+      background-color: var(--bg-tertiary);
+      border-color: rgba(245, 158, 11, 0.25);
+    }
+
+    .step-indicator {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: var(--bg-primary);
+      border: 2px solid var(--text-muted);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 600;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .step-card.active .step-indicator {
+      border-color: var(--accent-gold);
+      color: var(--accent-gold);
+      box-shadow: 0 0 10px var(--accent-gold-glow);
+    }
+
+    .step-card.completed .step-indicator {
+      background-color: rgba(16, 185, 129, 0.15);
+      border-color: var(--accent-emerald) !important;
+      color: var(--accent-emerald) !important;
+    }
+
+    .step-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .step-title-text {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+    }
+
+    .step-badge {
+      font-size: 0.72rem;
+      color: #94bcff !important; /* Cool high-contrast light blue/slate shade */
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 3px;
+      opacity: 0.95;
+      text-align: left;
+    }
+
+    .step-card.active .step-title-text {
+      color: #fff;
+    }
+
+    .step-card.active .step-badge {
+      color: var(--accent-gold) !important;
+      opacity: 1;
+    }
+
+    /* Active Training workspace card */
+    .quest-workspace {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+      .quest-workspace {
+        padding: 2rem;
+      }
+    }
+
+    .module-hero {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 1.25rem;
+    }
+
+    .module-badge {
+      background-color: rgba(6, 182, 212, 0.1);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      color: var(--accent-cyan);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 600;
+      align-self: flex-start;
+    }
+
+    .module-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .module-desc {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+    }
+
+    /* Guidelines and Whys */
+    .guideline-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .guideline-item {
+      background-color: rgba(255, 255, 255, 0.015);
+      border-left: 3px solid var(--accent-cyan);
+      padding: 16px;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    }
+
+    .guideline-why {
+      background-color: rgba(245, 158, 11, 0.05);
+      border: 1px dashed rgba(245, 158, 11, 0.15);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: #fef08a;
+    }
+
+    /* Quiz Card */
+    .quiz-card {
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      margin-top: 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+      .quiz-card {
+        padding: 1.75rem;
+      }
+    }
+
+    .quiz-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent-gold);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .quiz-question {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 1.25rem;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .opt-btn {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      font-family: 'Inter', sans-serif;
+      text-align: left;
+      padding: 14px 18px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      font-size: 0.92rem;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .opt-btn:hover:not(:disabled) {
+      background-color: rgba(255, 255, 255, 0.03);
+      border-color: var(--accent-gold);
+      color: #fff;
+    }
+
+    .opt-btn.correct {
+      background-color: rgba(16, 185, 129, 0.1) !important;
+      border-color: var(--accent-emerald) !important;
+      color: #fff !important;
+      padding-left: 44px;
+    }
+
+    .opt-btn.correct::before {
+      content: '✅';
+      position: absolute;
+      left: 18px;
+    }
+
+    .opt-btn.incorrect {
+      background-color: rgba(244, 63, 94, 0.08) !important;
+      border-color: var(--accent-rose) !important;
+      color: var(--text-muted) !important;
+      padding-left: 44px;
+    }
+
+    .opt-btn.incorrect::before {
+      content: '❌';
+      position: absolute;
+      left: 18px;
+    }
+
+    /* Feedback Box */
+    .feedback-banner {
+      display: none;
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      margin-top: 1.25rem;
+      animation: expand 0.3s ease-out forwards;
+    }
+
+    @keyframes expand {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .feedback-banner.correct {
+      display: block;
+      background-color: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .feedback-banner.incorrect {
+      display: block;
+      background-color: rgba(244, 63, 94, 0.08);
+      border: 1px solid rgba(244, 63, 94, 0.15);
+    }
+
+    .feedback-title {
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+
+    .feedback-title.correct { color: var(--accent-emerald); }
+    .feedback-title.incorrect { color: var(--accent-rose); }
+
+    .feedback-text {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* Workspace Footer Navigation */
+    .quest-nav-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .quest-btn {
+      background-color: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 12px 24px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .quest-btn:hover:not(:disabled) {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .quest-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .quest-btn.primary {
+      background: linear-gradient(135deg, var(--accent-gold), #d97706);
+      border: none;
+      color: #000;
+      box-shadow: 0 4px 15px var(--accent-gold-glow);
+    }
+
+    .quest-btn.primary:hover:not(:disabled) {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    /* Completion Screen Panel */
+    .completion-panel {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 3rem 1.5rem;
+      text-align: center;
+      max-width: 600px;
+      margin: 1.5rem auto;
+      display: none;
+      animation: pulseIn 0.5s ease-out forwards;
+    }
+
+    @keyframes pulseIn {
+      0% { opacity: 0; transform: scale(0.96); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .badge-shield {
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 1.5rem;
+      position: relative;
+    }
+
+    .badge-icon-layer {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 55px;
+      z-index: 10;
+    }
+
+    .completion-panel h2 {
+      font-size: 2.2rem;
+      background: linear-gradient(to right, #fff, #fef08a, var(--accent-gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+
+    .achievement-card {
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+    .achievement-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .achievement-stat-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent-gold);
+    }
+
+    .achievement-stat-lbl {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Bottom sticky bar for phone viewport */
+    .mobile-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      z-index: 40;
+    }
+
+    @media (min-width: 768px) {
+      .mobile-bar {
+        display: none;
+      }
+    }
+
+    .mobile-nav-item {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      cursor: pointer;
+    }
+
+    .mobile-nav-item.active {
+      color: var(--accent-gold);
+    }
+
+    .mobile-nav-con {
+      font-size: 1.3rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating toast notification for XP points -->
+  <div id="xp-toast" class="xp-toast">🎯 Quiz Complete! +10 XP</div>
+
+  <!-- Primary Header -->
+  <header>
+    <div class="header-container">
+      <div class="brand">
+        <div class="logo-container" style="background-color: var(--bg-tertiary); border: 2px solid var(--accent-gold); overflow: hidden; position: relative;">
+          <img src="logo.png" alt="St. Francis Rescue Logo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;" referrerPolicy="no-referrer" onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='flex';">
+          <div id="logo-fallback" style="display: none; width: 100%; height: 100%; align-items: center; justify-content: center; font-size: 1.6rem; color: var(--accent-gold); font-weight: bold; background-color: var(--bg-tertiary);">🐾</div>
+        </div>
+        <div class="brand-text">
+          <h1>St. Francis Rescue & Sanctuary</h1>
+          <p>🤠 Yuma, Arizona • 100% Volunteer Sanctuary</p>
+        </div>
+      </div>
+      <div class="hud">
+        <div class="badge-pill" id="hud-xp">🏆 <span id="xp-display">0</span> XP</div>
+        <div class="badge-pill success" id="hud-rank">🎖️ Novice</div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Toggle Tabs -->
+    <div class="tabs-nav">
+      <button class="tab-btn active" id="tab-welcome" onclick="switchTab('welcome-panel')">🏡 Welcome & Status</button>
+      <button class="tab-btn" id="tab-quest" onclick="switchTab('quest-panel')">⚔️ Training Quest</button>
+    </div>
+
+    <!-- TAB 1: WELCOME & ONBOARDING STORYBOARD -->
+    <section id="welcome-panel" class="tab-panel active">
+      <!-- Congratulations Top Banner on Home Back -->
+      <div id="completed-welcome-banner" style="display: none; background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(6, 182, 212, 0.12)); border: 2px solid var(--accent-emerald); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 20px rgba(16, 185, 129, 0.15);">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+          <span style="font-size: 2.2rem;">🤠</span>
+          <div>
+            <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; color: #fff; font-weight: 700; margin: 0;">Congratulations, Certified Sanctuary Volunteer!</h3>
+            <p style="color: var(--accent-emerald); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 600; margin: 2px 0 0 0;">STATUS: OFFICIALLY CERTIFIED ✓</p>
+          </div>
+        </div>
+        <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.25rem;">
+          Outstanding work! You have completed all 14 core safety modules, framing your visual observations of animal postures, flight zone physics, acoustic sensitivities, and desert climate mechanics under a safety-first methodology. You have demonstrated the mandatory protective mindset required to protect both yourself and our resident animals.
+        </p>
+        <div style="background-color: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.25rem;">
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--accent-gold); display: block; margin-bottom: 8px; font-weight: 600;">📲 ON-SITE SHIFT INSTRUCTIONS:</span>
+          <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin: 0;">
+            1. Report directly to your Shift Coordinator to check in.<br>
+            2. Launch the <strong>SanctuaryBase companion app</strong> on your mobile device.<br>
+            3. Tick off and complete chores inside the app so your coordinates sync across shifts.<br>
+            4. Lock your observations and visual audits inside SanctuaryBase in real-time. Remember, we never pick hooves—keep your checks at a safe distance!
+          </p>
+        </div>
+        <button class="quest-btn" onclick="document.getElementById('completed-welcome-banner').style.display='none';" style="font-size: 0.85rem; padding: 8px 18px; background-color: var(--bg-primary);">
+          Dismiss Notice ✓
+        </button>
+      </div>
+
+      <div class="welcome-card">
+        <span class="welcome-badge">ONBOARDING PATHWAY_</span>
+        <h2 class="welcome-title">Welcome to St. Francis Rescue & Sanctuary (SFR)</h2>
+        <p class="welcome-desc">
+          We are a grassroots, community-supported <strong>multi-species rescue shelter</strong> in sunny Yuma, Arizona. 
+          Our animals are cared for almost entirely by passionate volunteers like you. Here, you will be interacting with 
+          <strong>horses, dogs, and cats</strong>. 
+          <br><br>
+          Our mission is to provide safety, nutrition, and peaceful rehabilitation to neglected, surrendered or elderly animals.
+          Because of Yuma's intense summer climates, strict safety and meticulous hygiene are non-negotiable. 
+          <br><br>
+          To make things easy, we have split our training into **10 Core Required Modules** (which you must complete to volunteer on-site) and **14 Advanced Enrichment Modules** (which are completely optional but earn you bonus XP and certifications)!
+        </p>
+        <button class="quest-btn primary" onclick="switchTab('quest-panel')" style="font-size: 1rem; padding: 14px 28px;">
+          Start Volunteer Safety Quest! ⚔️
+        </button>
+      </div>
+
+      <!-- Volunteer Shift Eligibility & Interactive Study Board -->
+      <div style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; margin-top: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+        <div style="display: flex; flex-direction: column; md:flex-row; justify-content: space-between; align-items: flex-start; gap: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+          <div>
+            <h3 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; color: #fff; font-weight: 700; margin: 0;">🛡️ Volunteer Shift Eligibility</h3>
+            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 4px;">Complete the 10 Core Required Modules to be cleared for volunteer shifts.</p>
+          </div>
+          <div id="eligibility-status-badge" class="badge-pill" style="font-size: 0.9rem; padding: 8px 18px; margin-left: auto;">
+            ⏳ Status Pending
+          </div>
+        </div>
+
+        <!-- Two Detailed Progress Bars -->
+        <div style="display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1.5rem; @media (min-width: 768px) { grid-template-columns: 1fr 1fr; }">
+          <div style="background-color: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.88rem; font-weight: 600; margin-bottom: 8px;">
+              <span style="color: var(--accent-rose);">🔴 Core Required (10 Modules)</span>
+              <span id="required-progress-text" style="font-family: 'JetBrains Mono', monospace; color: var(--accent-rose);">0/10 Done</span>
+            </div>
+            <div class="progress-bar-container" style="background-color: var(--bg-primary); height: 10px; border-radius: 99px; overflow: hidden; border: 1px solid var(--border-color); position: relative;">
+              <div id="required-progress-fill" style="background: linear-gradient(to right, #f43f5e, #e11d48); height: 100%; width: 0%; transition: width 0.4s ease;"></div>
+            </div>
+          </div>
+
+          <div style="background-color: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.88rem; font-weight: 600; margin-bottom: 8px;">
+              <span style="color: var(--accent-cyan);">⚪ Optional Advanced (14 Modules)</span>
+              <span id="optional-progress-text" style="font-family: 'JetBrains Mono', monospace; color: var(--accent-cyan);">0/14 Done</span>
+            </div>
+            <div class="progress-bar-container" style="background-color: var(--bg-primary); height: 10px; border-radius: 99px; overflow: hidden; border: 1px solid var(--border-color); position: relative;">
+              <div id="optional-progress-fill" style="background: linear-gradient(to right, #06b6d4, #0891b2); height: 100%; width: 0%; transition: width 0.4s ease;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- All 24 Lessons Dashboard -->
+        <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 1.05rem; color: #fff; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">📖 Your Study Board <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal;">(Click any block to view and review lessons)</span></h4>
+        <div id="home-modules-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
+          <!-- Dynamically filled via JavaScript -->
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: TRAINING QUEST MODULES (SPLIT SCREEN) -->
+    <section id="quest-panel" class="tab-panel">
+      <!-- High Contrast Progress Tracker -->
+      <div id="quest-progress-banner" class="progress-banner">
+        <div class="progress-meta">
+          <span class="progress-title">Volunteer Safety Quest</span>
+          <span class="progress-numbers" id="quest-fraction">Completed: 0 of 24 Modules</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" id="quest-progress-fill"></div>
+        </div>
+      </div>
+
+      <!-- Standard Split layout -->
+      <div class="quest-layout" id="quest-active-layout">
+        <!-- Sidebar Navigation -->
+        <div class="quest-sidebar" id="quest-stepper-container">
+          <!-- Dynamically filled via JavaScript -->
+        </div>
+
+        <!-- Active Module Container -->
+        <div class="quest-workspace" id="active-module-workspace">
+          <!-- Dynamically filled via JavaScript -->
+        </div>
+      </div>
+
+      <!-- Congratulations Screen State -->
+      <div class="completion-panel" id="congrats-panel">
+        <div class="badge-shield">
+          <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+            <circle cx="50" cy="50" r="45" fill="#121829" stroke="#f59e0b" stroke-width="4"/>
+            <circle cx="50" cy="50" r="39" stroke="#10b981" stroke-width="2" stroke-dasharray="4 2"/>
+            <path d="M50 15 L80 35 L80 65 L50 85 L20 65 L20 35 Z" stroke="#06b6d4" stroke-width="2.5" fill="none"/>
+          </svg>
+          <div class="badge-icon-layer">🤠</div>
+        </div>
+        <h2>Training Completed!</h2>
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">
+          Outstanding effort! You have successfully mastered all <span id="final-total-modules-text">14</span> safety and husbandry modules for St. Francis Rescue & Sanctuary. 
+          You are officially cleared to work with our horses, dogs, and cats.
+        </p>
+
+        <div class="achievement-card">
+          <div class="achievement-stat">
+            <span class="achievement-stat-val" id="final-xp-val">140</span>
+            <span class="achievement-stat-lbl">XP Earned</span>
+          </div>
+          <div class="achievement-stat">
+            <span class="achievement-stat-val" id="final-score-val" style="color:var(--accent-emerald)">14 / 14</span>
+            <span class="achievement-stat-lbl">Perfect Score</span>
+          </div>
+          <div class="achievement-stat">
+            <span class="achievement-stat-val" style="color:var(--accent-cyan)">Certified</span>
+            <span class="achievement-stat-lbl">Sanctuary Rank</span>
+          </div>
+        </div>
+
+        <div style="background-color:rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.2); border-radius: 12px; padding: 15px; text-align: left; margin-bottom: 25px;">
+          <h4 style="color:#fff; margin-bottom: 6px; font-size:1.05rem;">📲 What happens next?</h4>
+          <p style="font-size:0.88rem; color:var(--text-secondary); line-height: 1.5;">
+            Coordinate with your Shift Lead to verify your certified volunteer status. Before you begin your chores, open the <strong>SanctuaryBase companion app</strong> on your mobile device. When you complete dry feeds, water fills, or gate security checks, immediately mark the task completed inside SanctuaryBase to synchronize state in real-time. Keep your knowledge sharp!
+          </p>
+        </div>
+
+        <button class="quest-btn primary" onclick="returnToHome()" style="margin: 0 auto; padding: 14px 40px; font-size:1rem;">
+          Complete & Return to Home Screen 🌟
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Sticky Mobile Bar -->
+  <div class="mobile-bar">
+    <button class="mobile-nav-item active" id="mob-welcome" onclick="switchTab('welcome-panel')">
+      <span class="mobile-nav-con">🏡</span>
+      <span>Home</span>
+    </button>
+    <button class="mobile-nav-item" id="mob-quest" onclick="switchTab('quest-panel')">
+      <span class="mobile-nav-con">⚔️</span>
+      <span>Safety Quest</span>
+    </button>
+  </div>
+
+  <script>
+    // 14 Detailed, progressive training modules ordered by difficulty (Beginner to Expert)
+        // 24 Progressive, teen-friendly training modules split into Core Required and Advanced Enrichment
+    const modules = [
+      {
+        id: 1,
+        required: true,
+        icon: "🔑",
+        type: "Basics (Required)",
+        title: "Main Gates & Signing In",
+        desc: "Learn why we must sign in immediately and keep all ranch gates locked tight.",
+        grandinAnalogy: "Think of our gates as protective shields. One loose latch on the main road fence can let a 1,000-lb horse escape into danger in a heartbeat! Walk, lock, and rattle.",
+        points: [
+          {
+            headline: "First Step: Signing the Paper Book",
+            text: "The moment you walk on-site, go straight to the Coordinator's desk and write your name in the physical roll book. Then, open your companion web app.",
+            why: "If there is a sudden fire drill, leaders must know exactly who is on the ranch so we don't leave anyone behind."
+          },
+          {
+            headline: "The Latch-and-Rattle Check",
+            text: "Every time you walk through a gate, close it fully, push the safety pin in, and shake the gate hard with your hand to make sure it's tight.",
+            why: "Animals are very clever and curious. They will push weak gate handles with their noses to escape!"
+          },
+          {
+            headline: "Stay Out of 'Staff Only' Fences",
+            text: "Certain rescue animals are scared of strangers. Check gates for red tags. Do not enter any habitat or pet any animal without a Lead with you.",
+            why: "We protect their peaceful rest and keep you safe from sudden fear reactions."
+          }
+        ],
+        quiz: {
+          q: "What is your absolute first task as soon as you walk onto the sanctuary grounds?",
+          opts: [
+            "Run into the horse paddock to give Rusty a quick hug.",
+            "Report to the coordinator, write your name in the roll book, and make sure gates are latched.",
+            "Hide your backpack in the feed bags and look for a kitten.",
+            "Climb on top of a tractor to take a selfie."
+          ],
+          correct: 1,
+          explain: "Correct! Reporting and checking perimeters is the most basic rule. It keeps you coordinated and the sanctuary completely escape-free!"
+        }
+      },
+      {
+        id: 2,
+        required: true,
+        icon: "🥾",
+        type: "Basics (Required)",
+        title: "How to Dress for Safety",
+        desc: "Learn why sandals can lead to broken toes and how floppy clothes get caught in latches.",
+        grandinAnalogy: "Ranch clothes are like active body armor. Thick boots shield your bones from heavy stomping paws and sharp thorns. Keep jewelry off and sunscreen on!",
+        points: [
+          {
+            headline: "The Solid Thick Footwear Rule",
+            text: "You must wear thick leather boots or heavy closed sneakers. Wearing sandals, crocs, slippers, or thin mesh trainers is strictly banned.",
+            why: "If a 1,200-lb horse steps on your foot, or a heavy dog hops on your toes, thin mesh offers zero bone protection."
+          },
+          {
+            headline: "Strip Off Loose Accessories",
+            text: "Remove dangling earrings, necklaces, key chains, and loose scarves before starting chores. Zip your phone into a deep protective pocket.",
+            why: "Goats and calves love to grab shiny straps. If they yank a necklace, it can hurt your neck or choke you."
+          },
+          {
+            headline: "Hydration Under the Yuma Sun",
+            text: "Drink fresh water constantly from your flask, even if you are not thirsty yet. Wear a wide sun-shading cap and rub on sunblock.",
+            why: "Yuma climbs past 100°F. Dehydration can sneak up on active teens in just 20 minutes."
+          }
+        ],
+        quiz: {
+          q: "Why are open-toed sandals or soft mesh shoes banned on the sanctuary grounds?",
+          opts: [
+            "They get covered in dirt too quickly and look messy.",
+            "They do not match the professional ranch uniform standard.",
+            "They offer zero protection against heavy hooves, sharp desert cactus thorns, or animal claws.",
+            "They make a minor squishing sound on sand."
+          ],
+          correct: 2,
+          explain: "Correct! Heavy leather boots or solid shoes act as safety shields, keeping your feet safe from heavy steps, prickly weeds, and sharp gravel!"
+        }
+      },
+      {
+        id: 3,
+        required: true,
+        icon: "🤫",
+        type: "Basics (Required)",
+        title: "Quiet Voices, Calm Spaces",
+        desc: "Discover why screaming or running causes animals to bolt in pure fear.",
+        grandinAnalogy: "Sensitive animals have giant microphones in their ears. Fast hand waves and loud shouting signal predator danger! Speak in soft whispers and move calmly.",
+        points: [
+          {
+            headline: "The Whisper Voice Standard",
+            text: "Keep your voice low and quiet. Shouting across paddocks is banned. If you need a partner, walk to them instead of yelling.",
+            why: "Shouting mimics the distress calls of predators, flooding an animal's raw brain with fear hormones."
+          },
+          {
+            headline: "Move Like You are in Slow Motion",
+            text: "Walk with a steady, relaxed pace. Do not jog, wave arms, jump over boards, or toss heavy metal water dishes with loud bangs.",
+            why: "Quick motions in peripheral vision scare rescued animals, causing them to bolt or kick in self-defense."
+          },
+          {
+            headline: "No Off-Schedule Hand Treats",
+            text: "Do not feed apples, carrots, or biscuits to any animal unless specified on their diet chart. Never feed treats from your hand.",
+            why: "Hand feeding teaches goats and horses to bite fingers and creates angry food-guarding fights among pen-mates."
+          }
+        ],
+        quiz: {
+          q: "Why must we never shout, run, or drop heavy metal tools near the animal pens?",
+          opts: [
+            "It alerts local desert birds, scaring them away.",
+            "Quick movements and loud noises trigger animal flight reflexes, causing them to bolt or defend themselves.",
+            "It drains the battery charge of on-site solar systems.",
+            "It is distracting to visitors reading the companion app."
+          ],
+          correct: 1,
+          explain: "Correct! Animals feel safe around low, steady voices and slow, predictable moves. Shouting signals threat, while whispering breeds peaceful trust."
+        }
+      },
+      {
+        id: 4,
+        required: true,
+        icon: "🧼",
+        type: "Basics (Required)",
+        title: "Germ Shields & Washing Hands",
+        desc: "Find out how clean hands and segregated shovels keep pathogens from spreading.",
+        grandinAnalogy: "Our hands are shuttle trains for microscopic germs. Touching a sick cattery box and walking straight to healthy kittens drives the flu express back and forth. Soap breaks the track!",
+        points: [
+          {
+            headline: "The Double Handwash Duty",
+            text: "Wash your hands with antibacterial soap for 20 seconds before and after entering any animal pen. Sanitarily step on footbath mats.",
+            why: "Nasty microscopic germs (like ringworm or canine parvo) are completely invisible but spread quickly on hands."
+          },
+          {
+            headline: "Color-Segregated Tool Rules",
+            text: "Use green-handled shovels only in horse stables, yellow scoops in catteries, and red scoops in dog runs. Never swap tools.",
+            why: "Using a cat scoop in a dog run or pig pen can transfer internal stomach bugs that cause diarrhea."
+          },
+          {
+            headline: "Return Tools to Vertical Wall Pegs",
+            text: "Never lay pitchforks, broom shafts, or rakes flat on sand corridors. Hang them up on their wall hangers immediately.",
+            why: "Tools on sandy paths get stepped on, causing painful leg gashes, broken handles, or sudden horse spooks."
+          }
+        ],
+        quiz: {
+          q: "What is the correct rule for using mucking tools (scoops, rakes) across different sanctuary species?",
+          opts: [
+            "Use whatever tools are closest to finish your shift fast.",
+            "Clean them on grass and leave them flat on sandy walking paths.",
+            "Only use color-segregated tools inside their specific zone and hang them vertically after cleanups.",
+            "Only clean spaces when animals are asleep at night."
+          ],
+          correct: 2,
+          explain: "Correct! Color-coded gear keeps bugs isolated. Hanging tools vertically on wall brackets prevents accidental human trips and animal leg cuts!"
+        }
+      },
+      {
+        id: 5,
+        required: true,
+        icon: "☀️",
+        type: "Basics (Required)",
+        title: "Cool Water Checks in Desert Heat",
+        desc: "Discover how to spot scalding bowls and why multiple water buckets prevent dehydration.",
+        grandinAnalogy: "Metal pans sitting on sand under direct Yuma heat act like little hotplates. If you wouldn't drink hot, steaming soup after running a race, neither can they!",
+        points: [
+          {
+            headline: "The Water Temperature Touch Check",
+            text: "Touch the water inside bowls before walking away. If it feels warm or hot, dump it, clean it, and refill with fresh cool tap water.",
+            why: "Animals cannot gulp down hot boiling water, leading to heat exhaustion, heat stroke, or colic."
+          },
+          {
+            headline: "Tuck Bowls Inside Deep Shade",
+            text: "Always place watering bowls and pails in fully roofed shade spots. Never position them in open sunbeams.",
+            why: "Shade keeps the water cool, refreshing, and safe to drink all day."
+          },
+          {
+            headline: "The Two-Bucket Rule",
+            text: "Never leave an animal stall with only one bucket. Always fill a secondary backup water pail in case they knock one over.",
+            why: "Playful dogs and big horses frequently nudge pails over with their noses when bored."
+          }
+        ],
+        quiz: {
+          q: "Where should drinking water be placed inside stall enclosures in Arizona?",
+          opts: [
+            "In open sand areas to disinfect the bowl under direct ultraviolet rays.",
+            "Always deep in covered shade, with a secondary backup bucket filled in case of spills.",
+            "Elevated on thin wire lines near the ceiling.",
+            "Beside waste bins where dirt can drift into it."
+          ],
+          correct: 1,
+          explain: "Correct! Nestling pails inside complete shade keeps liquids cool and clean. Having a backup bucket guarantees water access if they tip one over!"
+        }
+      },
+      {
+        id: 6,
+        required: true,
+        icon: "👂",
+        type: "Basics (Required)",
+        title: "Reading Animal Warning Signs",
+        desc: "Learn the silent physical signals animals send when asking for space.",
+        grandinAnalogy: "Sensitive rescue animals yell at us silently with their bodies long before they snarl or swipe. If you study their eyes, ears, and tails, they tell you exactly how they feel!",
+        points: [
+          {
+            headline: "Whale Eye and Lip Licking",
+            text: "If a dog turns its head away but watches you so you see a crescent of white in their pupil ('Whale Eye'), or has a tucked tail, freeze!",
+            why: "These are fear warning signs. Forcing contact when a dog shows this causes defensive biting."
+          },
+          {
+            headline: "Flat Pinned Ears on Horses",
+            text: "When a horse flats its ears pinned all the way back against its neck, it is telling you 'Back off right now!' Stop and walk back.",
+            why: "A horse with pinned ears is ready to defend itself by biting or kicking. Call a Coordinator."
+          },
+          {
+            headline: "Skin Ripples & Swishing Tails on Cats",
+            text: "Stop patting a cat immediately if their back skin ripples, their tail thumps, or their ears twitch back.",
+            why: "Overstimulation makes nice cats switch from purring to swiping out of sudden nerve overload."
+          }
+        ],
+        quiz: {
+          q: "What does it mean when a puppy shows 'Whale Eye' (white crescents) and has its tail tucked low?",
+          opts: [
+            "The pup wants you to hug it tighter.",
+            "The dog is feeling nervous or scared, asking for space. Advancing can cause an accidental bite.",
+            "The animal is hungry for grain treats.",
+            "The puppy wants to show off its skills."
+          ],
+          correct: 1,
+          explain: "Correct! Respecting these fear signs is the key to volunteer safety. Back up, turn your eyes away, and give the dog a chance to calm down!"
+        }
+      },
+      {
+        id: 7,
+        required: true,
+        icon: "⚕️",
+        type: "Basics (Required)",
+        title: "5-Min Soap Wash & Safe Distance",
+        desc: "Always wash scratches immediately and keep equine checks at a safe distance.",
+        grandinAnalogy: "Animal mouth and claw germs love tiny, airless pockets under your skin. A minor prick is like a little breeding tube. Wash it out under running water with soap immediately!",
+        points: [
+          {
+            headline: "The 5-Minute Running Wash Drill",
+            text: "If you get even a tiny pink scratch, nip, or scrape, immediately scrub the area under running water with soap for 5 solid minutes.",
+            why: "The rubbing action of soap and water flushes out mouth germs before they lock inside skin layers."
+          },
+          {
+            headline: "Never Hide Minor Incidents",
+            text: "Tell your Shift Coordinator about every single scratch or scrape before leaving. Logging minor injuries keeps the ranch safe.",
+            why: "A minor animal scrape can swell and turn into infection (cellulitis) in hours if germs are trapped under skin."
+          },
+          {
+            headline: "Zero Picking of Hooves",
+            text: "Volunteers must never pick or clean hooves. Keep your equine checks visual-only from a safe 45-degree angle near their shoulder.",
+            why: "Lifting a horse's leg requires special training. An unbalanced horse can easily step on you."
+          }
+        ],
+        quiz: {
+          q: "What is the mandatory first step if you get a volunteer scratch or minor animal bite?",
+          opts: [
+            "Hide it with your shirt sleeve and keep on mucking.",
+            "Wipe it on sawdust and wait until you return home.",
+            "Flush it under fast running tap water with soap for 5 minutes, then report it to the Coordinator immediately.",
+            "Spray it with horse flyspray."
+          ],
+          correct: 2,
+          explain: "Correct! Mechanically flushing a scratch and notifying leaders prevents cellulitis and logs safety statistics securely."
+        }
+      },
+      {
+        id: 8,
+        required: true,
+        icon: "📋",
+        type: "Basics (Required)",
+        title: "Shift Roll Papers & Logging Pins",
+        desc: "Why writing your name on the sheet and checking the app keeps us coordinated.",
+        grandinAnalogy: "Our daily paper log book is the sanctuary control panel. If there is a brush fire or crisis, the leader must know exactly who is in which pasture in an instant!",
+        points: [
+          {
+            headline: "The Paper Attendance Log is King",
+            text: "Always sign your physical name in the paper roll book when you arrive and leave. Never bypass the entry desk.",
+            why: "Evacuation leaders use this list to make sure every helper is accounted for and safe."
+          },
+          {
+            headline: "Check the Web Companion",
+            text: "Open our sanctuary app on your device before starting. Look at the chore bulletin to see critical notes.",
+            why: "It confirms which paddocks are already watered or fed, avoiding missed water fills."
+          },
+          {
+            headline: "Lock Your ID Sleeve",
+            text: "Buckle your bright plastic ID sleeve onto your arm. It lets coordinators identify you across muddy fields.",
+            why: "Keeps unauthorized visitors from slipping into pens unseen."
+          }
+        ],
+        quiz: {
+          q: "Why is it mandatory to write your name on the physical paper registry sheet as soon as you arrive?",
+          opts: [
+            "To send homework newsletters to your family.",
+            "It gives evacuation leaders a direct audit of exactly who is on the ranch during wildfire or heat emergencies.",
+            "It is required to unlock your phone's cellular connection.",
+            "So you can qualify for ranch souvenir t-shirts."
+          ],
+          correct: 1,
+          explain: "Correct! We must account for every life. The paper register is our central source of truth in physical emergencies!"
+        }
+      },
+      {
+        id: 9,
+        required: true,
+        icon: "🧭",
+        type: "Basics (Required)",
+        title: "Point of Balance (Shoulders)",
+        desc: "Steer big rescue animals without ropes using their invisible shoulder line.",
+        grandinAnalogy: "An animal's shoulder is like a swinging turn gate. Step behind that shoulder line to cuddle/nudge them forward. Stand in front of it to make them break or retreat!",
+        points: [
+          {
+            headline: "The Invisible Shoulder Line",
+            text: "Every farm animal has an invisible pivot line across their shoulders. This is their natural balancing center.",
+            why: "Animals naturally measure human angles to negotiate distance and move away from pressure."
+          },
+          {
+            headline: "Walk Behind for Go-Forward",
+            text: "To guide a horse or calf forward, step slightly behind their shoulder line and walk diagonally toward their tail-flank.",
+            why: "Your weight behind their shoulder gently prompts forward motion without pulling ropes."
+          },
+          {
+            headline: "Step Ahead for Halting",
+            text: "To stop a walking animal, move your body forward until you cross ahead of their shoulder line.",
+            why: "It blocks their visual escape route, resulting in a gentle, touch-free stop."
+          }
+        ],
+        quiz: {
+          q: "How do you gently prompt a rescue horse or calf to walk forward without pulling hard on halter ropes?",
+          opts: [
+            "Wave your arms and yell directly behind their tail.",
+            "Walk up to their face and pull the lead line with all your strength.",
+            "Position your body slightly behind their shoulder line, pushing pressure diagonally toward their hip.",
+            "Clap your hands directly next to their ears."
+          ],
+          correct: 2,
+          explain: "Correct! Standing behind the Point of Balance uses the animal's natural geometry to steer them in a quiet, friendly, stress-free way."
+        }
+      },
+      {
+        id: 10,
+        required: true,
+        icon: "🚪",
+        type: "Basics (Required)",
+        title: "Twin-Lock Door Habits (Airlocks)",
+        desc: "Prevent escapes by sealing double-door spaces one clicking lock at a time.",
+        grandinAnalogy: "Double doors are like spaceship airlock portals! Never open the inner gate until the outer gate is clicked and locked first.",
+        points: [
+          {
+            headline: "Airlock Bubble Rule",
+            text: "Always shut the first door fully and make sure it is latched before opening the second door into cat rooms or dog suites.",
+            why: "Our animals are fast. The airlock guarantees if a kitty dashes out, they are trapped in a middle buffer zone rather than escaping to roads."
+          },
+          {
+            headline: "Look Down Before Door Swings",
+            text: "Check your feet before opening cattery doors. Cute tiny kittens love to sit right under door cracks.",
+            why: "Prevents painful paw squishes or tails getting caught under heavy dragging doors."
+          },
+          {
+            headline: "Never Prop Airlocks Open",
+            text: "Never use water pails or heavy grain bins to hold airlock gates open. It bypasses our safety bubble.",
+            why: "If you carry grain and prop both doors, you open an escape tunnel straight to the outside."
+          }
+        ],
+        quiz: {
+          q: "What is the proper way to go through cattery or kennel double-door systems?",
+          opts: [
+            "Slam both doors as fast as you can.",
+            "Prop both gates open with grain buckets to make mucking faster.",
+            "Open the inner gate only after verifying the outer gate is closed and clicked.",
+            "Let several dogs run ahead of you."
+          ],
+          correct: 2,
+          explain: "Correct! The 'One Closed Door at All Times' habit keeps animals secure. Propping airlocks open wipes out our system's core defense!"
+        }
+      },
+      {
+        id: 11,
+        required: false,
+        icon: "🐴",
+        type: "Enrichment (Optional)",
+        title: "Horse Invisible Blind Spots",
+        desc: "Learn why horses kick when you sneak up from behind or under their chins.",
+        grandinAnalogy: "Sneaking up on a horse from behind is like tapping someone on the shoulder in a dark room! They kick out of pure reflex before they can think. Approach their shoulder!",
+        points: [
+          {
+            headline: "The Rear Tail Blind Zone",
+            text: "A horse has a blind spot directly behind their tail. If you stand behind them, they cannot see you at all.",
+            why: "If you startle them by touching their flank inside this blind cone, their back-kick reflexes jump instantly."
+          },
+          {
+            headline: "The Nose and Chin Blind Spot",
+            text: "Horses cannot see directly under their nose or chin. Reaching straight up to touch their muzzle scares them.",
+            why: "A hand approaching their nose appears suddenly, causing them to throw their head up in surprise."
+          },
+          {
+            headline: "The Safe Diagonal Approach",
+            text: "Always approach horses from the left side, walking at a 45-degree angle toward their shoulder while calling their name.",
+            why: "This allows them to watch you clearly, building trust before any physical contact occurs."
+          }
+        ],
+        quiz: {
+          q: "Where are a horse's two major blind zones located?",
+          opts: [
+            "On their left and right shoulder blades.",
+            "Directly behind their tail and directly under their chin/nose.",
+            "Above their ears and on their back knees.",
+            "Inside their hay feeders."
+          ],
+          correct: 1,
+          explain: "Correct! Walk up to their shoulder on a diagonal. It is their widest safe viewing zone, keeping you out of kick-range!"
+        }
+      },
+      {
+        id: 12,
+        required: false,
+        icon: "🐎",
+        type: "Enrichment (Optional)",
+        title: "Holding Ropes Accordion-Style",
+        desc: "Never wrap lead lines around your hand or wrist—learn the folding rule.",
+        grandinAnalogy: "Wrapping a rope is like handcuffing yourself to a runaway train! If a 1,200-lb horse bolts, your wrist gets squeezed tight, dragging you down.",
+        points: [
+          {
+            headline: "Fold, Don't Loop",
+            text: "Gather the loose end of your lead rope in flat, back-and-forth accordion folds in your hand. Never coil it in circles.",
+            why: "If the horse panics, the folds simply escape safely from your open palm, saving you from a dragging injury."
+          },
+          {
+            headline: "The Hand-Space Rule",
+            text: "Hold the lead line roughly 6 inches away from the halter bolt. Do not grab the metal clip directly.",
+            why: "If the horse tosses its nose, holding the metal clip can trap your fingers, crushing bones in the hardware."
+          },
+          {
+            headline: "Always Carry on the Left Side",
+            text: "Walk next to the horse's left shoulder, matching their pace. Don't let them walk ahead of you.",
+            why: "Standing at their shoulder keeps you in control, away from heavy back hooves."
+          }
+        ],
+        quiz: {
+          q: "What is the primary reason for folding excess lead rope accordion-style instead of coiling it around your knuckles?",
+          opts: [
+            "It looks more elegant for photographs.",
+            "It prevents the rope from grazing sandbox dust.",
+            "If the horse panics and bolts, the flat folds slip harmlessly out of your hand instead of trapping you in a painful drag.",
+            "It increases your score inside the companion app."
+          ],
+          correct: 2,
+          explain: "Correct! Keep ropes flat and uncoiled. The Palm-Thumb Accordion grip lets you let go if a runaway animal poses drag threats!"
+        }
+      },
+      {
+        id: 13,
+        required: false,
+        icon: "🪢",
+        type: "Enrichment (Optional)",
+        title: "The Fast-Release Horse Tie Knot",
+        desc: "Discover how quick-release slipknots save panicked tied horses.",
+        grandinAnalogy: "A tied horse that panics is like a trapped animal. Solid double-knots are impossible to untie under tension. One pull of a fast knot sets them free instantly!",
+        points: [
+          {
+            headline: "The Quick Slip Loop",
+            text: "Only tie horses to hitching posts using a quick-release slipknot loop. Never tie them down with a double-knot.",
+            why: "When a tied horse gets spooked, they pull back with immense force. Standard knots lock solid under load."
+          },
+          {
+            headline: "Breakaway Twine Bridging",
+            text: "Never tie a horse's lead rope directly to bare metal. Wrap a weak loop of baling twine to the ring first and tie to the twine.",
+            why: "If the horse pulls back with massive, dangerous weight, the twine snaps first, avoiding spine injury."
+          },
+          {
+            headline: "Tie High at Chest Level",
+            text: "Tie the rope at your own chest level, with about 18 inches of slack cord. Never tie ropes close to ground floors.",
+            why: "If tied low, the horse can easily throw a front leg over the rope, trapping them in terrifying leg struggles."
+          }
+        ],
+        quiz: {
+          q: "What is the key life-saving feature of our mandatory quick-release horse knot?",
+          opts: [
+            "It automatically locks tighter when the horse pulls back.",
+            "A single quick tug on the rope's tail instantly undoes the loop, releasing a panicked horse before neck damage occurs.",
+            "It is colored red to identify sick animals.",
+            "It requires multiple tools to untie."
+          ],
+          correct: 1,
+          explain: "Correct! Fast-release loops instantly undo under tension when pulled by hand, preventing severe equine neck and spine strains."
+        }
+      },
+      {
+        id: 14,
+        required: false,
+        icon: "🐖",
+        type: "Enrichment (Optional)",
+        title: "Heavy Farm Pigs & Cows",
+        desc: "Learn why heavy sanctuary pigs and cows require wide paddock escapes.",
+        grandinAnalogy: "Our farm pigs are sweethearts, but they weight 400 lbs and lack speed brakes when rushing for melon rind feeds! Keep your backs away from fences.",
+        points: [
+          {
+            headline: "Avoid the Wall Sandwich Zone",
+            text: "Never stand directly between a moving cow or heavy pig and a solid wood wall or metal arena rail.",
+            why: "If an animal gets startled by a fly and steps back, they can easily squish you against the barrier."
+          },
+          {
+            headline: "Drop-Feeds Over Gates",
+            text: "When serving pigs or calves, dump feed buckets into their dishes from the outside of their rail fences. Don't carry bins through crowds.",
+            why: "Excited farm animals will crowd, push, and step on your toes in their rush to reach dinner."
+          },
+          {
+            headline: "Watch the Wave Shift",
+            text: "Herd animals shift together in waves. If a loud gate slams, the group moves as one. Make sure you are near exits.",
+            why: "Gives you a clear escape route if the herd does a sudden defensive rotation."
+          }
+        ],
+        quiz: {
+          q: "What is the critical spacing rule when mucking a stall with a heavy farm steer or pig?",
+          opts: [
+            "Always stand directly in front of their feed bowls.",
+            "Never stand between a heavy animal and a hard wall where you can get squished in an accidental shift.",
+            "Ignore their positions and sweep sand under their legs.",
+            "Shout at them to stand completely still."
+          ],
+          correct: 1,
+          explain: "Correct! Farm animals are massive. Staying out of the 'Wall Sandwich Zone' ensures you won't get pinched or stepped on!"
+        }
+      },
+      {
+        id: 15,
+        required: false,
+        icon: "🦴",
+        type: "Enrichment (Optional)",
+        title: "Dog Food Jealousy Safety",
+        desc: "Avoid putting hands in food dishes of rescue dogs with guarding habits.",
+        grandinAnalogy: "To a stray rescue dog, food is absolute gold. Reaching into their active food pan is seen as a direct robbery threat. Keep hands clear!",
+        points: [
+          {
+            headline: "The Closed Gate Barrier",
+            text: "Always shut and latch kennel separator gates before placing food bowls inside their run dividers.",
+            why: "Keeps a clear fence between you and the dog while you slide their meal in, preventing food rush bites."
+          },
+          {
+            headline: "Zero Bowl Adjust Touches",
+            text: "Do not reach down to settle, adjust, or pick up a dog's dish while they are actively swallowing grain.",
+            why: "The dog's wild survival reflex can jump out, resulting in defensive growls or snaps."
+          },
+          {
+            headline: "Pick Up Empty Cups Safely",
+            text: "Only collect dirty water bowls when dogs are out playing, or toss some kibbles to distract them first.",
+            why: "Ensures cleansing chores can be completed without challenging protective pups."
+          }
+        ],
+        quiz: {
+          q: "What is the safest way to deliver grain kibbles to a dog that shows food-guarding habits?",
+          opts: [
+            "Pat them on the back while they eat to show them you are friendly.",
+            "Lock them behind their divider gate, drop the food bowl safely, and never touch the dish while they swallow.",
+            "Take their bowl away-mid feed to teach them a lesson.",
+            "Yell at them until they walk away from the food bowl."
+          ],
+          correct: 1,
+          explain: "Correct! Barrier dividers and keeping hands off active food dishes eliminates dinner tension, keeping dogs relaxed."
+        }
+      },
+      {
+        id: 16,
+        required: false,
+        icon: "🦮",
+        type: "Enrichment (Optional)",
+        title: "Dog Walking Thumb Leash Grip",
+        desc: "Discover the safe Palm-Thumb loop hold that protects fingers from breaks.",
+        grandinAnalogy: "If a 70-lb dog chases a desert lizard while the leash is coiled tight on your fingers, it acts like a loop-vise, breaking bones! Hold it in your palm.",
+        points: [
+          {
+            headline: "The Palm-Thumb Hook Check",
+            text: "Slip the leash loop over your bare thumb, fold the excess strap back-and-forth, and wrap your fist tight.",
+            why: "If the dog bolts, the accordion fold releases easily if you let go, saving you from shoulder pulls."
+          },
+          {
+            headline: "Never Wrap Fingers",
+            text: "Do not coil or wrap webbing leash straps around your knuckles, wrist, or active digits.",
+            why: "A sudden dog lunge can tighten the strap like a tourniquet, cutting blood lanes or breaking fingers."
+          },
+          {
+            headline: "Two-Hand Control Brace",
+            text: "Keep one hand anchoring the loop at your waist and your other hand steering the strap's middle section.",
+            why: "Gives you maximum balanced pull resistance if an energetic pup tries to leap after cats."
+          }
+        ],
+        quiz: {
+          q: "How should you hold a dog's walk leash to avoid severe hand or finger fractures?",
+          opts: [
+            "Wrap it tightly three times around your knuckles for maximum grip.",
+            "Hook the loop on your thumb, accordion-fold the webbing inside your palm, and keep your knuckles free.",
+            "Hold the leash using only your index finger.",
+            "Tie it directly to your back belt loop."
+          ],
+          correct: 1,
+          explain: "Correct! The Palm-Thumb Hook gives you absolute lock control while avoiding dangerous leash loops that can break fingers."
+        }
+      },
+      {
+        id: 17,
+        required: false,
+        icon: "🥵",
+        type: "Enrichment (Optional)",
+        title: "Spotting Dog Heat Stroke",
+        desc: "Desert heat is intense. How to audit paw paths and spot canine heat fatigue.",
+        grandinAnalogy: "Dogs don't sweat like teens—they can only cool off by panting! If their tongue looks like a wide pancake, they are in the danger zone!",
+        points: [
+          {
+            headline: "Red Flag Heavy Panting",
+            text: "Look for super-fast frantic panting, excessive thick drool, bright red gums, and a wide floppy tongue.",
+            why: "These warning signs tell you the dog's internal system is climbing past critical boundaries."
+          },
+          {
+            headline: "The Back-of-Hand 7-Second Check",
+            text: "Place the back of your bare hand on sunny pavement paths for 7 seconds. If it's too hot to hold, it's banned for dogs!",
+            why: "Bare roads will peel the skin off dog paw pads and cause painful blisters in seconds."
+          },
+          {
+            headline: "Sponge Cooling (No Ice Water)",
+            text: "Get a hot dog to cooled rooms immediately. Sponge them down with cool water on their paws and belly. Do not use ice water.",
+            why: "Ice water constricts blood paths, trapping severe heat deep inside their vital organs."
+          }
+        ],
+        quiz: {
+          q: "How do you verify if path asphalt is safe for rescue dogs to walk on during active shifts?",
+          opts: [
+            "We check if other birds are sitting on the road tracks.",
+            "Press the back of your bare hand on the road for 7 seconds; if it feels painfully hot, paw walkies are banned.",
+            "Let the dog walk and see if they whine after five minutes.",
+            "Throw some ice cubes on the sand."
+          ],
+          correct: 1,
+          explain: "Correct! The 7-second hand test keeps paws safe. Always walk dogs on shaded grassy borders or cool sand tracks instead!"
+        }
+      },
+      {
+        id: 18,
+        required: false,
+        icon: "😼",
+        type: "Enrichment (Optional)",
+        title: "Calm Touches for Overexcited Cats",
+        desc: "Learn why lower back strokes trigger surprise swipes and how to stay in calm petting zones.",
+        grandinAnalogy: "Stroking a cat's tail base is like turning up a volume knob—it is fun for a second, then overwhelms their nerves! Keep pats high near cheeks.",
+        points: [
+          {
+            headline: "Safe Cheek and Jaw Rubs",
+            text: "Only stroke a cat's chin, cheeks, forehead, and of course the hollow space behind their ears.",
+            why: "Cats love cheek rubs because their facial glands release cozy bonding scents, calming them down."
+          },
+          {
+            headline: "The No-Fly Tail-Base Zone",
+            text: "Never stroke high down a cat's lower back or touch their tails or soft belly flaps.",
+            why: "These areas are packed with highly reactive nerves. Touching them overstimulates felines rapidly."
+          },
+          {
+            headline: "The Warning Skin Wave",
+            text: "Watch for twitching muzzles, skin ruffling, or flat ears. Stop patting immediately if these appear.",
+            why: "It is their direct request for space. Continuing to pet will lead to self-defense swipes."
+          }
+        ],
+        quiz: {
+          q: "What is the safest touch protocol to adopt when interacting with shyer rescue cats?",
+          opts: [
+            "Stroke their lower back near the tail and capture their paws.",
+            "Tickle their soft belly as they lie on their back.",
+            "Gently stroke cheek sides, jaws, and foreheads while keeping your touch flat and predictable.",
+            "Lift them up by their collars to secure them."
+          ],
+          correct: 2,
+          explain: "Correct! Cheek and jaw rubs are peaceful bonding zones. Avoiding tails and bellies prevents nerve overload swipes!"
+        }
+      },
+      {
+        id: 19,
+        required: false,
+        icon: "🐈",
+        type: "Enrichment (Optional)",
+        title: "Safe Kitty Litter Scooping",
+        desc: "Why gloves and mask protocols keep toxic cat parasites away from your lungs.",
+        grandinAnalogy: "Cleaning kitty waste holds hidden biology. Protective face-masks and gloves isolate invisible litter box microbes!",
+        points: [
+          {
+            headline: "Step 1: Gloves and Face-Masks",
+            text: "Always put on disposable plastic gloves and a protective face-mask before scooping litter pans.",
+            why: "Completely blocks you from absorbing stray dust particles or getting germs under your nails."
+          },
+          {
+            headline: "Pregnant Volunteer Ban",
+            text: "If you are pregnant, notify coordinators immediately. Pregnant staff are banned from cleaning litters.",
+            why: "Cat waste can carry Toxoplasma, a parasite that leads to serious birth-health complications."
+          },
+          {
+            headline: "Sanitary Scoop Cleanups",
+            text: "Clean scoops with blue disinfectant sprays and hang them on wall pegs after each shift.",
+            why: "Stops stomach bugs from traveling to healthy cats."
+          }
+        ],
+        quiz: {
+          q: "Who is strictly barred from cleaning cat litter boxes due to parasite risks?",
+          opts: [
+            "Teens who wear safety spectacles.",
+            "Pregnant volunteers, to protect maternal health.",
+            "Coordinators who are logging shift registers.",
+            "Volunteers who handle equine hay."
+          ],
+          correct: 1,
+          explain: "Correct! Toxoplasmosis poses a severe risk during child development. Pregnant helpers are given other safe ranch tasks!"
+        }
+      },
+      {
+        id: 20,
+        required: false,
+        icon: "🌾",
+        type: "Enrichment (Optional)",
+        title: "Colic Prevention & Feed Names",
+        desc: "Giving animals the wrong grain can cause fatal stomach bloats. Always audit feed charts!",
+        grandinAnalogy: "Pouring random grain grains into rescue feeders is like handing pill bottles out blindly! Match gate names, verify scoops, and lock grain bins!",
+        points: [
+          {
+            headline: "Read the Shift Diet Chart First",
+            text: "Always look at our daily whiteboard feed chart. Verify the animal's name on their gate badge before scoop drops.",
+            why: "Many rescue ponies have sensitive metabolic laminitis or colic risks where one wrong cup is lethal."
+          },
+          {
+            headline: "Separate Herd Feeding Hookups",
+            text: "Clip horses to their own tie lines during grain drops. Don't let them crowd a single dish.",
+            why: "Fast horses will steal meals from elderly mares, resulting in toxic over-eating bloat."
+          },
+          {
+            headline: "Bolt Feed Room Bins Airtight",
+            text: "Always latch feed room heavy latch rings tightly. Check that metal grain drums are airtight.",
+            why: "If a horse escapes its paddock, loose open grain is a death trap. They will feed until their stomach swells."
+          }
+        ],
+        quiz: {
+          q: "What is the critical rule for preparing custom grain scoop feeds for our rescue equines?",
+          opts: [
+            "Feed whatever grain is closest to your bucket scoop.",
+            "Cross-verify feed labels with gate name badges to prevent toxic metabolic bloat or colic.",
+            "Feed horses leftover dog food grains to save resources.",
+            "Pour grain directly into sand corridors."
+          ],
+          correct: 1,
+          explain: "Correct! Matching diets with gate name plates prevents digestive disaster. Keep feed buckets sealed airtight!"
+        }
+      },
+      {
+        id: 21,
+        required: false,
+        icon: "🧹",
+        type: "Enrichment (Optional)",
+        title: "Sweep Spilled Grains Instantly",
+        desc: "Sweeping loose oats starvation-isolates desert ants, rodents, and snakes.",
+        grandinAnalogy: "A spilled bag of grain is a buffet invite for desert rattlesnakes and fire ants. Sweeping up spills immediately keeps stall hallways cool and snake-free!",
+        points: [
+          {
+            headline: "Grab the Broom Right Away",
+            text: "If you spill dry grains, grab a broom immediately and sweep it into metal trash cans. Never leave seed on walkways.",
+            why: "Loose oats bring desert fire ants, mice, and snakes close to animal hooves."
+          },
+          {
+            headline: "Clear Pallet Dust Weekly",
+            text: "Help clean under wooden grain pallets once a week. Dust buildup traps moisture and creates dangerous mold.",
+            why: "Inhaling moldy dust spikes chronic reactive breathing issues in elderly horses and helpers."
+          },
+          {
+            headline: "Lock Metal Lid Loops",
+            text: "Dump swept waste into steel barrels and click their metal latch clips shut. Never leave open bags on ranch floorings.",
+            why: "Desert rats will bite straight through plastic sacks, multiplying overnight."
+          }
+        ],
+        quiz: {
+          q: "Why must spilled grain feeds be swept up and cleared immediately from barn walkways?",
+          opts: [
+            "Spilled grains decrease the resale value of sand dust.",
+            "Oats attract dangerous desert pests (fire ants, mice, rattlesnakes) that threaten animal housing.",
+            "It is required to keep path photographs matching standard guidelines.",
+            "Spilled oats absorb ambient cellular waves."
+          ],
+          correct: 1,
+          explain: "Correct! Immediate sweeps cut off pest food, keeping animal paddocks and walking paths clean and snake-free!"
+        }
+      },
+      {
+        id: 22,
+        required: false,
+        icon: "📲",
+        type: "Enrichment (Optional)",
+        title: "SanctuaryCompanion App Syncing",
+        desc: "Why logging completed water drafts and shift logs stops dangerous double-feeding.",
+        grandinAnalogy: "Skipping your chore logs on our app is like skipping a vital medication chart. Always log so the next shift knows who is cared for!",
+        points: [
+          {
+            headline: "Sync within 10 Minutes",
+            text: "Open SanctuaryBase and check off water, gate audits, or feed drops within 10 minutes of finishing.",
+            why: "Incoming volunteers can see what chores are completed, preventing double-feeding horses."
+          },
+          {
+            headline: "Flag Health Warning Cues",
+            text: "If you notice a dog moving slow, keeping their tail low, or a horse coughing, write it down in the 'Daily Notes' field.",
+            why: "Alerts our veterinarian team early so they can treat the animal before it gets severe."
+          },
+          {
+            headline: "The Verbal Handshake Check",
+            text: "When your helper replacement arrives, verbally report any gate issues or sick animals directly to them.",
+            why: "Guarantees high-safety details never get missed between busy shifts."
+          }
+        ],
+        quiz: {
+          q: "Why is it important to check off completed water and feed chores in the app right away?",
+          opts: [
+            "To prove you can work quicker than other helpers.",
+            "It stops dangerous duplicate feeding (colic risk) and lets other shifts see that hydration audits are complete.",
+            "It triggers the automatic release of phone camera permissions.",
+            "Our county sheriff requires real-time pasture coordinates."
+          ],
+          correct: 1,
+          explain: "Correct! Logging tasks ensures clear timing across shifts. It prevents horse colic and guarantees no dog is left thirsty."
+        }
+      },
+      {
+        id: 23,
+        required: false,
+        icon: "🔐",
+        type: "Enrichment (Optional)",
+        title: "Nightly Lock Rattle Walks",
+        desc: "Rattle every gate lock before night closure to ensure perimeters are airtight.",
+        grandinAnalogy: "A paddock gate can look perfectly shut from 20 feet away, but the latch pin could be loose. Touch it, shake it, rattle it!",
+        points: [
+          {
+            headline: "The Touch-Check Evening Tour",
+            text: "Before checking out, walk fence corridors and physically shake every sliding lock pin and padlock.",
+            why: "Shaking locks guarantees the pin is deeply seated rather than just looking aligned."
+          },
+          {
+            headline: "Sunset Bucket Top-Ups",
+            text: "Peer inside night pails. Refill all water bowls to the brim before night shelter shutdown.",
+            why: "Desert night winds dry out moisture, leaving horses thirsty for hours."
+          },
+          {
+            headline: "Sign Out Physical Registry Book",
+            text: "Add your out-time in the paper register book and return your safe arm badge to its wooden box.",
+            why: "Informs managers you are safely empty from the ranch, keeping attendance lines clean."
+          }
+        ],
+        quiz: {
+          q: "What is the critical routine to perform before officially vacating the sanctuary grounds at sunset?",
+          opts: [
+            "Wave at the barns from your car window and honk.",
+            "Walk fence lines, physically touch/rattle every gate latch pin, check water levels, and sign out on paper.",
+            "Leave all gate paths open to let night winds circulate.",
+            "Assume other shift coordinators completed all lock walks."
+          ],
+          correct: 1,
+          explain: "Correct! Touch and rattle checks ensure gates are secure. It guarantees animal safety during quiet night hours."
+        }
+      },
+      {
+        id: 24,
+        required: false,
+        icon: "🛠️",
+        type: "Enrichment (Optional)",
+        title: "Safe Tool Hanging & Storage",
+        desc: "Learn why hanging pitchfork tines flat against support walls prevents face cuts.",
+        grandinAnalogy: "Pitchfork tines are like sharp kitchen knives! Hanging them properly on wall studs protects passing faces and shoulders.",
+        points: [
+          {
+            headline: "Orientation Flat Against Wood",
+            text: "Hang metal pitchforks and shovels in wall hooks with their sharp claws facing flat against the wooden beams.",
+            why: "Keeps sharp teeth pointing away from busy walkways, avoiding shoulder gashes."
+          },
+          {
+            headline: "Wash Mucking Carts Daily",
+            text: "Hose sand down from plastic carts, spray handles with sanitizer, and roll them into the tool cage.",
+            why: "Keeps biting flies from gathering near feed bins during hot desert nights."
+          },
+          {
+            headline: "Lock Tool Box Padlocks",
+            text: "Make sure tool storage cages have their brass padlocks clicked line-tight.",
+            why: "Rescue dogs will chew on wooden handle gears, which can cause severe throat splinters."
+          }
+        ],
+        quiz: {
+          q: "How should metallic rake teeth or broom blades be oriented when hung up on wall pegs?",
+          opts: [
+            "Pointing outwards at eye level so they are easy to grab.",
+            "Facing inwards flat against the backing wood to prevent painful physical jabs or eye pokes.",
+            "Tossed flat in walking lanes.",
+            "They should not be hung up; throw them into waste buckets."
+          ],
+          correct: 1,
+          explain: "Correct! Facing tines inward protects shoulders and equine ears, keeping walking corridors completely accident-free!"
+        }
+      }
+    ];
+
+    let currentModuleIndex = 0;
+    let completedModules = JSON.parse(localStorage.getItem('completedModules')) || [];
+    let xp = parseInt(localStorage.getItem('volunteerXp')) || 0;
+    let selectedOptionIdx = null;
+
+    // Set Up LocalStorage data and UI
+    function initApp() {
+      const storedCount = completedModules.length;
+      updateXpUI();
+      updateProgressUI();
+      renderSteppers();
+      renderHomeStudyBoard();
+      loadModule(currentModuleIndex);
+    }
+
+    function switchTab(panelId) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.mobile-nav-item').forEach(m => m.classList.remove('active'));
+
+      const activePanel = document.getElementById(panelId);
+      if (activePanel) activePanel.classList.add('active');
+
+      if (panelId === 'welcome-panel') {
+        document.getElementById('tab-welcome').classList.add('active');
+        document.getElementById('mob-welcome').classList.add('active');
+      } else if (panelId === 'quest-panel') {
+        document.getElementById('tab-quest').classList.add('active');
+        document.getElementById('mob-quest').classList.add('active');
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateXpUI() {
+      document.getElementById('xp-display').textContent = xp;
+      
+      const rankElement = document.getElementById('hud-rank');
+      if (xp >= 150) {
+        rankElement.textContent = "🎖️ Certified Ranger";
+        rankElement.className = "badge-pill success";
+      } else if (xp >= 100) {
+        rankElement.textContent = "🎖️ Certified Volunteer";
+        rankElement.className = "badge-pill success";
+      } else if (xp >= 50) {
+        rankElement.textContent = "🎖️ Ranger";
+        rankElement.className = "badge-pill";
+      } else {
+        rankElement.textContent = "🎖️ Novice";
+        rankElement.className = "badge-pill";
+      }
+    }
+
+    function updateProgressUI() {
+      const total = modules.length;
+      const done = completedModules.length;
+      const fillPercentage = (done / total) * 100;
+
+      document.getElementById('quest-fraction').textContent = `Completed: ${done} of ${total} Modules`;
+      document.getElementById('quest-progress-fill').style.width = `${fillPercentage}%`;
+
+      // Dual progress calculations
+      const requiredModules = modules.filter(m => m.required);
+      const optionalModules = modules.filter(m => !m.required);
+
+      const requiredDone = requiredModules.filter(m => completedModules.includes(m.id)).length;
+      const optionalDone = optionalModules.filter(m => completedModules.includes(m.id)).length;
+
+      document.getElementById('required-progress-text').textContent = `${requiredDone}/${requiredModules.length} Done`;
+      document.getElementById('required-progress-fill').style.width = `${(requiredDone / requiredModules.length) * 100}%`;
+
+      document.getElementById('optional-progress-text').textContent = `${optionalDone}/${optionalModules.length} Done`;
+      document.getElementById('optional-progress-fill').style.width = `${(optionalDone / optionalModules.length) * 100}%`;
+
+      // Update Eligibility Badge
+      const elBadge = document.getElementById('eligibility-status-badge');
+      if (elBadge) {
+        if (requiredDone === requiredModules.length) {
+          elBadge.textContent = "✅ On-Site Shift Eligible!";
+          elBadge.style.backgroundColor = "rgba(16, 185, 129, 0.15)";
+          elBadge.style.color = "var(--accent-emerald)";
+          elBadge.style.border = "1px solid var(--accent-emerald)";
+        } else {
+          elBadge.textContent = `⏳ Pending Core Training (${requiredDone}/10 Completed)`;
+          elBadge.style.backgroundColor = "rgba(244, 63, 94, 0.15)";
+          elBadge.style.color = "var(--accent-rose)";
+          elBadge.style.border = "1px solid var(--accent-rose)";
+        }
+      }
+    }
+
+    function renderHomeStudyBoard() {
+      const container = document.getElementById('home-modules-list');
+      if (!container) return;
+      container.innerHTML = '';
+
+      modules.forEach((mod, idx) => {
+        const isCompleted = completedModules.includes(mod.id);
+        const card = document.createElement('div');
+        
+        // Style variables matching custom theme rules
+        const borderColor = mod.required 
+          ? (isCompleted ? 'rgba(16, 185, 129, 0.4)' : 'rgba(244, 63, 94, 0.3)')
+          : (isCompleted ? 'rgba(6, 182, 212, 0.4)' : 'rgba(148, 163, 184, 0.1)');
+        const bgGradient = mod.required
+          ? (isCompleted ? 'rgba(16, 185, 129, 0.03)' : 'rgba(244, 63, 94, 0.02)')
+          : (isCompleted ? 'rgba(6, 182, 212, 0.03)' : 'rgba(255, 255, 255, 0.01)');
+        
+        card.style.cssText = `
+          background: ${bgGradient};
+          border: 1px solid ${borderColor};
+          border-radius: var(--radius-md);
+          padding: 1.2rem;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          gap: 12px;
+          position: relative;
+          transition: transform 0.2s, border-color 0.2s;
+        `;
+        
+        const badgeColor = mod.required ? 'var(--accent-rose)' : 'var(--accent-cyan)';
+        const badgeLabel = mod.required ? 'Core Required' : 'Optional Advanced';
+        const checkboxState = isCompleted 
+          ? '<span style="color: var(--accent-emerald); font-weight: bold; display: flex; align-items: center; gap: 4px;">✅ Completed</span>' 
+          : '<span style="color: var(--text-muted); display: flex; align-items: center; gap: 4px;">⬜ Not Done</span>';
+
+        card.innerHTML = `
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="font-size: 0.72rem; font-weight: 700; color: ${badgeColor}; text-transform: uppercase; letter-spacing: 0.05em;">${badgeLabel}</span>
+              <span style="font-size: 1.1rem;">${mod.icon}</span>
+            </div>
+            <h5 style="font-family: 'Space Grotesk', sans-serif; font-size: 0.98rem; font-weight: 600; color: #fff; margin: 0 0 6px 0;">${mod.title}</h5>
+            <p style="color: var(--text-secondary); font-size: 0.8rem; line-height: 1.4; margin: 0;">${mod.desc}</p>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 8px;">
+            <div style="font-size: 0.8rem; font-family: 'JetBrains Mono', monospace;">
+              ${checkboxState}
+            </div>
+            <button class="quest-btn" onclick="reviewLessonFromBoard(${idx})" style="font-size: 0.72rem; padding: 4px 10px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px;">
+              📖 ${isCompleted ? 'Review' : 'Study'}
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function reviewLessonFromBoard(index) {
+      selectModuleByIndex(index);
+      switchTab('quest-panel');
+    }
+
+    function renderSteppers() {
+      const container = document.getElementById('quest-stepper-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      modules.forEach((mod, idx) => {
+        const isCompleted = completedModules.includes(mod.id);
+        const isActive = currentModuleIndex === idx;
+
+        const card = document.createElement('button');
+        
+        // Add styling elements for required vs optional
+        const badgeBorder = mod.required ? 'border-left: 3px solid var(--accent-rose);' : 'border-left: 3px solid var(--accent-cyan);';
+        
+        card.className = `step-card ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`;
+        card.style.cssText = `${badgeBorder} margin-bottom: 8px; text-align: left; width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px; background: var(--bg-tertiary); border-radius: 6px; cursor: pointer;`;
+        card.onclick = () => { selectModuleByIndex(idx); };
+
+        card.innerHTML = `
+          <div class="step-indicator" style="display: flex; align-items: center; justify-content: center; font-weight: bold; width: 24px; height: 24px; border-radius: 50%; font-size: 0.8rem; background-color: ${isCompleted ? 'var(--accent-emerald)' : 'rgba(255,255,255,0.05)'}; color: ${isCompleted ? '#000' : 'var(--text-secondary)'};">${isCompleted ? '✓' : idx + 1}</div>
+          <div class="step-info" style="display: flex; flex-direction: column; flex: 1;">
+            <span class="step-title-text" style="font-size: 0.85rem; font-weight: 600; color: ${isActive ? '#fff' : 'var(--text-primary)'};">${mod.title}</span>
+            <span class="step-badge" style="font-size: 0.72rem; color: var(--text-secondary); display: flex; align-items: center; gap: 4px; margin-top: 2px;">
+              ${mod.icon} • ${mod.required ? '<span style="color:var(--accent-rose); font-weight: 500;">Required</span>' : '<span style="color:var(--accent-cyan); font-weight: 500;">Optional</span>'}
+            </span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      // Auto-scroll the active step card into view inside the sidebar
+      setTimeout(() => {
+        const activeCard = container.querySelector('.step-card.active');
+        if (activeCard) {
+          activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }, 50);
+    }
+
+    function selectModuleByIndex(idx) {
+      currentModuleIndex = idx;
+      selectedOptionIdx = null;
+      
+      // Hide completion board if it was showing
+      document.getElementById('congrats-panel').style.display = 'none';
+      document.getElementById('quest-active-layout').style.display = 'grid';
+      document.getElementById('quest-progress-banner').style.display = 'flex';
+
+      renderSteppers();
+      loadModule(currentModuleIndex);
+      
+      // Force scroll to top of viewport per user direction
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+
+    function loadModule(idx) {
+      const mod = modules[idx];
+      const workspace = document.getElementById('active-module-workspace');
+      selectedOptionIdx = null;
+
+      const isCompleted = completedModules.includes(mod.id);
+
+      // Create detailed HTML Guidelines
+      let pointsHtml = '';
+      mod.points.forEach((pt, pIdx) => {
+        pointsHtml += `
+          <div class="guideline-item">
+            <h4 style="color: #fff; font-size: 1rem; margin-bottom: 4px;">📌 ${idx + 1}.${pIdx + 1} ${pt.headline}</h4>
+            <p style="color: var(--text-secondary); font-size: 0.92rem; line-height: 1.5;">${pt.text}</p>
+            <div class="guideline-why">🧠 <strong>THE WHY:</strong> ${pt.why}</div>
+          </div>
+        `;
+      });
+
+      // Create Quiz Options
+      let optionsHtml = '';
+      mod.quiz.opts.forEach((opt, optIdx) => {
+        optionsHtml += `
+          <button class="opt-btn" id="opt-${optIdx}" onclick="selectQuizOption(${optIdx})" ${isCompleted ? 'disabled' : ''}>
+            ${opt}
+          </button>
+        `;
+      });
+
+      workspace.innerHTML = `
+        <div class="module-hero">
+          <span class="module-badge">${mod.type.toUpperCase()}_</span>
+          <h3 class="module-title">${mod.icon} Module ${idx + 1}: ${mod.title}</h3>
+          <p class="module-desc">${mod.desc}</p>
+        </div>
+
+        <div class="guideline-container">
+          ${pointsHtml}
+        </div>
+
+        <!-- Quick Takeaway Easy-to-Grasp Card -->
+        <div style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.1)); border: 1.5px dashed var(--accent-gold); border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.05);">
+          <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+            <span style="font-size: 1.6rem; line-height: 1.2;">🤠</span>
+            <div>
+              <h4 style="font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem; color: var(--accent-gold); font-weight: 700; margin: 0 0 6px 0; letter-spacing: 0.5px; text-transform: uppercase;">💡 To make things simple, here's what this all means:</h4>
+              <p style="color: #fff; font-size: 0.92rem; line-height: 1.5; margin: 0; font-weight: 500; font-style: italic;">
+                "${mod.grandinAnalogy}"
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="quiz-card">
+          <div class="quiz-header">⚔️ Sentry Challenge</div>
+          <div class="quiz-question">${mod.quiz.q}</div>
+          <div class="quiz-options" id="options-box">
+            ${optionsHtml}
+          </div>
+
+          <!-- Quiz Feedback State Banner -->
+          <div class="feedback-banner" id="quiz-feedback-box">
+            <div class="feedback-title" id="feedback-headline">Correct Statement!</div>
+            <p class="feedback-text" id="feedback-body-text"></p>
+          </div>
+        </div>
+
+        <div class="quest-nav-footer">
+          <button class="quest-btn" id="quest-back-btn" onclick="offsetModule(-1)" ${idx === 0 ? 'disabled' : ''}>
+            ← Back Module
+          </button>
+          
+          <button class="quest-btn ${isCompleted ? 'correct-go' : 'primary'}" id="quest-next-btn" onclick="handleWorkspaceNext()">
+            ${isCompleted ? (idx === modules.length - 1 ? 'Finish Quest 🎉' : 'Next Module →') : 'Verify Option 🔒'}
+          </button>
+        </div>
+      `;
+
+      // If already completed, lock correct option visuals
+      if (isCompleted) {
+        setTimeout(() => {
+          const btn = document.getElementById(`opt-${mod.quiz.correct}`);
+          if (btn) btn.classList.add('correct');
+          
+          const feedback = document.getElementById('quiz-feedback-box');
+          feedback.className = "feedback-banner correct";
+          document.getElementById('feedback-headline').textContent = "✅ Challenges Already Solved";
+          document.getElementById('feedback-body-text').textContent = mod.quiz.explain;
+        }, 50);
+      }
+    }
+
+    function selectQuizOption(optIdx) {
+      const mod = modules[currentModuleIndex];
+      // Prevent clicking if already completed
+      if (completedModules.includes(mod.id)) return;
+
+      selectedOptionIdx = optIdx;
+
+      // Reset hover highlights
+      document.querySelectorAll('.opt-btn').forEach(btn => {
+        btn.classList.remove('correct', 'incorrect');
+        btn.style.borderColor = 'var(--border-color)';
+        btn.style.color = 'var(--text-secondary)';
+      });
+
+      const selectedBtn = document.getElementById(`opt-${optIdx}`);
+      if (selectedBtn) {
+        selectedBtn.style.borderColor = 'var(--accent-gold)';
+        selectedBtn.style.color = '#fff';
+      }
+    }
+
+    function verifyChallengeInput() {
+      const mod = modules[currentModuleIndex];
+      if (selectedOptionIdx === null) {
+        alert("Please select one option to verify your safety mindset!");
+        return;
+      }
+
+      const isCorrect = selectedOptionIdx === mod.quiz.correct;
+      const feedback = document.getElementById('quiz-feedback-box');
+      const headline = document.getElementById('feedback-headline');
+      const body = document.getElementById('feedback-body-text');
+
+      // Lock buttons
+      document.querySelectorAll('.opt-btn').forEach(btn => btn.setAttribute('disabled', 'true'));
+
+      if (isCorrect) {
+        // Highlight active button green
+        document.getElementById(`opt-${selectedOptionIdx}`).className = "opt-btn correct";
+        feedback.className = "feedback-banner correct";
+        headline.className = "feedback-title correct";
+        headline.textContent = "🎉 Brilliant Mindset! Correct";
+        body.textContent = mod.quiz.explain;
+
+        // Earn XP
+        if (!completedModules.includes(mod.id)) {
+          completedModules.push(mod.id);
+          localStorage.setItem('completedModules', JSON.stringify(completedModules));
+          xp += 10;
+          localStorage.setItem('volunteerXp', xp);
+          
+          triggerXpToast();
+          updateXpUI();
+          updateProgressUI();
+          renderSteppers();
+          renderHomeStudyBoard();
+        }
+
+        // Convert button into action next
+        const nextBtn = document.getElementById('quest-next-btn');
+        nextBtn.className = "quest-btn correct-go";
+        nextBtn.textContent = currentModuleIndex === modules.length - 1 ? 'Finish Quest 🎉' : 'Next Module →';
+
+      } else {
+        // Highlight active button rose
+        document.getElementById(`opt-${selectedOptionIdx}`).className = "opt-btn incorrect";
+        feedback.className = "feedback-banner incorrect";
+        headline.className = "feedback-title incorrect";
+        headline.textContent = "❌ Alert! Safety Breach";
+        body.textContent = "That option poses a significant danger to you or the animal. Review the why callouts above and try again!";
+
+        // Reset so they can choose again
+        setTimeout(() => {
+          document.querySelectorAll('.opt-btn').forEach(btn => btn.removeAttribute('disabled'));
+        }, 1500);
+      }
+    }
+
+    function handleWorkspaceNext() {
+      const mod = modules[currentModuleIndex];
+      const isCompleted = completedModules.includes(mod.id);
+
+      if (!isCompleted) {
+        verifyChallengeInput();
+      } else {
+        // Go to next
+        if (currentModuleIndex === modules.length - 1) {
+          showQuestCompletion();
+        } else {
+          offsetModule(1);
+        }
+      }
+    }
+
+    function offsetModule(offset) {
+      let targetIdx = currentModuleIndex + offset;
+      if (targetIdx >= 0 && targetIdx < modules.length) {
+        selectModuleByIndex(targetIdx);
+      }
+    }
+
+    function triggerXpToast() {
+      const toast = document.getElementById('xp-toast');
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    function showQuestCompletion() {
+      document.getElementById('quest-active-layout').style.display = 'none';
+      document.getElementById('quest-progress-banner').style.display = 'none';
+      
+      const congrats = document.getElementById('congrats-panel');
+      congrats.style.display = 'block';
+      document.getElementById('final-xp-val').textContent = xp;
+      
+      const totalTextEl = document.getElementById('final-total-modules-text');
+      if (totalTextEl) totalTextEl.textContent = modules.length;
+      
+      const scoreValEl = document.getElementById('final-score-val');
+      if (scoreValEl) scoreValEl.textContent = modules.length + ' / ' + modules.length;
+      
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function returnToHome() {
+      // Once training is complete & they return, show the beautiful congrats card instead of a browser alert
+      switchTab('welcome-panel');
+      const banner = document.getElementById('completed-welcome-banner');
+      if (banner) {
+        banner.style.display = 'block';
+        setTimeout(() => {
+          banner.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 150);
+      }
+    }
+
+    function resetTrainingProgress() {
+      if (confirm("Reset all training progress points? This will wipe your completions and XP!")) {
+        completedModules = [];
+        xp = 0;
+        localStorage.removeItem('completedModules');
+        localStorage.removeItem('volunteerXp');
+        
+        currentModuleIndex = 0;
+        updateXpUI();
+        updateProgressUI();
+        renderSteppers();
+        renderHomeStudyBoard();
+        loadModule(0);
+        
+        // Hide the completion banner on reset
+        const banner = document.getElementById('completed-welcome-banner');
+        if (banner) banner.style.display = 'none';
+        
+        switchTab('welcome-panel');
+      }
+    }
+
+    // Initialize On Load
+    function navigateVolunteerApp(tabId) {
+      try {
+        const tabMap = {
+          'tasks': 'dashboard',
+          'myshift': 'shifts',
+          'supplies': 'supplies',
+          'announce': 'admin-announcements',
+          'training': 'volunteer-training',
+          'profile': 'volunteer-profile'
+        };
+        const appTab = tabMap[tabId];
+        if (appTab) {
+          window.parent.postMessage({type: 'navigate', tab: appTab}, '*');
+        }
+      } catch (e) {}
+    }
+
+    window.onload = initApp;
+  </script>
+
+  <!-- Bottom navigation bar (communicates to parent app) -->
+  <nav id="training-bottom-nav" style="position:fixed;bottom:0;left:0;right:0;background:#070a13;border-top:1px solid rgba(148,163,184,.15);display:flex;justify-content:space-around;height:56px;z-index:200">
+    <button onclick="navigateVolunteerApp('tasks')" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#94a3b8;font-size:9px;font-weight:700;background:none;border:none;cursor:pointer;padding:4px 0 8px;letter-spacing:.04em">
+      <span style="font-size:19px">🏠</span>HOME
+    </button>
+    <button onclick="navigateVolunteerApp('myshift')" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#94a3b8;font-size:9px;font-weight:700;background:none;border:none;cursor:pointer;padding:4px 0 8px;letter-spacing:.04em">
+      <span style="font-size:19px">📅</span>MY SHIFTS
+    </button>
+    <button onclick="navigateVolunteerApp('supplies')" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#94a3b8;font-size:9px;font-weight:700;background:none;border:none;cursor:pointer;padding:4px 0 8px;letter-spacing:.04em">
+      <span style="font-size:19px">📦</span>SUPPLIES
+    </button>
+    <button onclick="navigateVolunteerApp('announce')" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#94a3b8;font-size:9px;font-weight:700;background:none;border:none;cursor:pointer;padding:4px 0 8px;letter-spacing:.04em">
+      <span style="font-size:19px">📢</span>NEWS
+    </button>
+    <button onclick="navigateVolunteerApp('training')" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#f59e0b;font-size:9px;font-weight:700;background:none;border:none;cursor:pointer;padding:4px 0 8px;letter-spacing:.04em">
+      <span style="font-size:19px">🎓</span>TRAINING
+    </button>
+    <button onclick="navigateVolunteerApp('profile')" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#94a3b8;font-size:9px;font-weight:700;background:none;border:none;cursor:pointer;padding:4px 0 8px;letter-spacing:.04em">
+      <span style="font-size:19px">👤</span>PROFILE
+    </button>
+  </nav>
+
+</body>
+</html>

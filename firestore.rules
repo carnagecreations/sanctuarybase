@@ -1,0 +1,562 @@
+// ═══════════════════════════════════════════════════════════════════════════════
+// SanctuaryBase — Firestore Security Rules (Extended)
+// Includes all collections from Admin project plus additional collections
+// ═══════════════════════════════════════════════════════════════════════════════
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── HELPER FUNCTIONS ──────────────────────────────────────────────────────
+
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    function myRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isAdmin() {
+      return isAuth() && myRole() == 'admin';
+    }
+
+    function isStaff() {
+      return isAuth() && (myRole() == 'staff' || myRole() == 'admin');
+    }
+
+    function isPrivileged() {
+      return isAuth() && (myRole() == 'staff' || myRole() == 'admin');
+    }
+
+    function isSelf(uid) {
+      return isAuth() && request.auth.uid == uid;
+    }
+
+    // ─── USERS ─────────────────────────────────────────────────────────────────
+    // The role field here is the single source of truth for permissions —
+    // a user can create/edit their own profile but never self-escalate, so
+    // logging in never grants yourself staff/admin access on its own. The
+    // one exception: a first-time login may claim a role a staff/admin
+    // already queued for that email in roleInvites — verified server-side
+    // here via get(), not just trusted from the client (see stores/auth.js).
+    // Staff can otherwise promote/demote between volunteer and staff; only
+    // admins can grant or revoke admin, or touch another admin's record.
+    match /users/{uid} {
+      allow read: if isAuth();
+      allow create: if isSelf(uid) && (
+        request.resource.data.role == 'volunteer'
+        || (
+          exists(/databases/$(database)/documents/roleInvites/$(request.resource.data.emailLower))
+          && get(/databases/$(database)/documents/roleInvites/$(request.resource.data.emailLower)).data.role == request.resource.data.role
+        )
+      );
+      allow update: if isAdmin()
+        || (isSelf(uid) && request.resource.data.role == resource.data.role)
+        || (isStaff()
+            && resource.data.role in ['volunteer', 'staff']
+            && request.resource.data.role in ['volunteer', 'staff']);
+      allow delete: if isAdmin();
+    }
+
+    // ─── ROLE INVITES ──────────────────────────────────────────────────────────
+    // Lets staff/admin assign a role to someone by email before they've ever
+    // logged in. Consumed automatically the first time that email signs in
+    // and their users/{uid} doc is created (see stores/auth.js).
+    match /roleInvites/{email} {
+      // A brand-new user needs to read their OWN invite (if any) before
+      // their users/{uid} doc — and therefore any privileged role — even
+      // exists. Scoped to their own verified email only, not a general read.
+      allow read: if isPrivileged() || (isAuth() && request.auth.token.email.lower() == email);
+      allow create, update: if isAdmin()
+        || (isStaff() && request.resource.data.role in ['volunteer', 'staff']);
+      allow delete: if isPrivileged();
+    }
+
+    // ─── WAIVERS ───────────────────────────────────────────────────────────────
+    match /waivers/{uid} {
+      allow read: if isAuth();
+      allow create: if isSelf(uid);
+      allow update: if isSelf(uid) || isPrivileged();
+      allow delete: if isPrivileged();
+    }
+
+    // ─── TASKS ─────────────────────────────────────────────────────────────────
+    // Volunteers may claim/release/complete tasks (the VolunteerHub loop) but
+    // only staff/admin can change a task's substance (title, notes, assignment).
+    match /tasks/{docId} {
+      allow read: if isAuth();
+      allow create: if isPrivileged();
+      allow update: if isPrivileged() || (isAuth()
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['claimedBy', 'claimedDate', 'completedBy', 'completedDate', 'status']));
+      allow delete: if isPrivileged();
+    }
+
+    // ─── ANNOUNCEMENTS ─────────────────────────────────────────────────────────
+    match /announcements/{docId} {
+      allow read: if isAuth();
+      allow write: if isPrivileged();
+    }
+
+    // ─── SCHEDULE / SHIFTS ─────────────────────────────────────────────────────
+    // Unused by any current page (nothing in src/ references this collection) — tightened defensively
+    match /scheduledshifts/{docId} {
+      allow read: if isPrivileged();
+      allow create: if isPrivileged();
+      allow update: if isAuth();
+      allow delete: if isPrivileged();
+    }
+
+    // Real clock-in/clock-out + shift scheduling collection (Shifts.vue,
+    // stores/shifts.js). Had no rule at all until this pass — every read and
+    // write here was silently denied by the default-deny fallback, so the
+    // entire Shifts page (self clock-in, admin shift management) was
+    // non-functional in production despite looking wired up in the UI.
+    match /shifts/{docId} {
+      allow read: if isAuth();
+      // A volunteer may only create a shift doc claimed as themselves (the
+      // real-time self clock-in path); publishing an open, unclaimed slot
+      // is an admin/staff-only action (self-service shift scheduling).
+      allow create: if isAuth() && (
+        request.resource.data.volunteerId == request.auth.uid || isPrivileged()
+      );
+      // Either the current owner (self clock-out, releasing a claim), or a
+      // volunteer claiming a currently-open/unclaimed slot for themselves,
+      // or a privileged force-clock-out/edit.
+      allow update: if isAuth() && (
+        resource.data.volunteerId == request.auth.uid ||
+        (resource.data.volunteerId == null && request.resource.data.volunteerId == request.auth.uid) ||
+        isPrivileged()
+      );
+      allow delete: if isPrivileged();
+    }
+
+    // ─── SHIFT SWAP REQUESTS ───────────────────────────────────────────────────
+    // Unused by any current page — tightened defensively
+    match /swaps/{docId} {
+      allow read: if isPrivileged();
+      allow create: if isAuth();
+      allow update: if isAuth();
+      allow delete: if isPrivileged();
+    }
+
+    match /swaprequests/{docId} {
+      allow read: if isPrivileged();
+      allow create: if isAuth();
+      allow update: if isAuth();
+      allow delete: if isPrivileged();
+    }
+
+    // ─── BITE / INCIDENT REPORTS ───────────────────────────────────────────────
+    // Anyone signed in can file an incident; only staff/admin can read them —
+    // reports name people and animals in legally sensitive situations.
+    match /biteReports/{docId} {
+      allow read: if isPrivileged();
+      allow create: if isAuth();
+      allow update: if isPrivileged();
+      allow delete: if isAdmin();
+    }
+
+    // ─── MILESTONES ────────────────────────────────────────────────────────────
+    // Unused by any current page — tightened defensively
+    match /milestones/{docId} {
+      allow read: if isPrivileged();
+      allow write: if isAdmin();
+    }
+
+    // ─── SHIFT NOTES ───────────────────────────────────────────────────────────
+    // Unused by any current page — tightened defensively
+    match /shiftnotes/{docId} {
+      allow read: if isPrivileged();
+      allow create: if isAuth();
+      allow update: if isPrivileged();
+      allow delete: if isPrivileged();
+    }
+
+    // ─── KUDOS ─────────────────────────────────────────────────────────────────
+    // Unused by any current page — tightened defensively
+    match /kudos/{docId} {
+      allow read: if isPrivileged();
+      allow create: if isAuth();
+      allow update: if isPrivileged();
+      allow delete: if isPrivileged();
+    }
+
+    // ─── AVAILABILITY ──────────────────────────────────────────────────────────
+    // Only AvailabilityPage.vue (admin-availability, staff/admin route) reads
+    // or writes this — no volunteer-facing page touches it.
+    match /availability/{docId} {
+      allow read: if isPrivileged();
+      allow write: if isPrivileged();
+    }
+
+    // ─── FUNDRAISING ───────────────────────────────────────────────────────────
+    // Unused by any current page — tightened defensively
+    match /fundraising/{docId} {
+      allow read: if isPrivileged();
+      allow write: if isPrivileged();
+    }
+
+    // ─── SUPPLIES ──────────────────────────────────────────────────────────────
+    match /supplies/{docId} {
+      allow read: if isAuth();
+      allow write: if isAuth();
+    }
+
+    // ─── GOALS ─────────────────────────────────────────────────────────────────
+    // Unused by any current page. Read rule matches the write rule's existing
+    // shape (own record or staff/admin) rather than a blanket isPrivileged(),
+    // since this is a per-user doc a volunteer should see their own copy of.
+    match /goals/{uid} {
+      allow read: if isSelf(uid) || isPrivileged();
+      allow write: if isSelf(uid) || isPrivileged();
+    }
+
+    // ─── ONBOARDING ────────────────────────────────────────────────────────────
+    match /onboarding/{uid} {
+      allow read: if isSelf(uid) || isPrivileged();
+      allow write: if isSelf(uid) || isPrivileged();
+    }
+
+    // ─── TASK LIBRARY ──────────────────────────────────────────────────────────
+    // Only read by App.vue's recurring-task generator, which already gates
+    // itself to staff/admin before running (see stores/recurringTasks.js).
+    match /tasklibrary/{docId} {
+      allow read: if isPrivileged();
+      allow write: if isPrivileged();
+    }
+
+    // ─── GROUPS ────────────────────────────────────────────────────────────────
+    // Unused by any current page — tightened defensively
+    match /groups/{docId} {
+      allow read: if isPrivileged();
+      allow write: if isPrivileged();
+    }
+
+    // ─── REMINDER LOGS ─────────────────────────────────────────────────────────
+    // Unused by any current page — tightened defensively
+    match /reminderlogs/{docId} {
+      allow read: if isPrivileged();
+      allow write: if isPrivileged();
+    }
+
+    // ─── PUSH NOTIFICATION SUBSCRIPTIONS ───────────────────────────────────────
+    match /pushsubs/{uid} {
+      allow read: if isSelf(uid) || isAdmin();
+      allow write: if isSelf(uid);
+      allow delete: if isSelf(uid) || isAdmin();
+    }
+
+    // ─── APP CONFIG ────────────────────────────────────────────────────────────
+    // Unused by any current page — tightened defensively
+    match /config/{docId} {
+      allow read: if isPrivileged();
+      allow write: if isPrivileged();
+    }
+
+    // ─── ANIMAL INVENTORY ──────────────────────────────────────────────────────
+    match /animals/{docId} {
+      allow read: if isAuth();
+      allow write: if isPrivileged();
+    }
+
+    match /animalMedical/{docId} {
+      allow read: if isAuth();
+      allow write: if isPrivileged();
+    }
+
+    // Unused by any current page — MedsTab.vue actually reads animalMedical,
+    // not this collection. Tightened defensively.
+    match /animalmeds/{docId} {
+      allow read: if isPrivileged();
+      allow write: if isPrivileged();
+    }
+
+    match /vaccinations/{docId} {
+      allow read: if isAuth();
+      allow write: if isPrivileged();
+    }
+
+    // Unused by any current page (the vaccinations tab reads the
+    // `vaccinations` collection above, not this one) — tightened defensively
+    match /animalvaccines/{docId} {
+      allow read: if isPrivileged();
+      allow write: if isPrivileged();
+    }
+
+    // Unused by any current page — tightened defensively
+    match /animalweights/{docId} {
+      allow read: if isPrivileged();
+      allow write: if isPrivileged();
+    }
+
+    // ─── DAILY ROUNDS ──────────────────────────────────────────────────────────
+    // ─── MORNING ROUNDS ────────────────────────────────────────────────────────
+    // MorningRoundsPage.vue (admin-rounds, staff/admin route) reads/writes this
+    // directly — it had no rule of its own until now, so every save/history
+    // load was silently denied by the default-deny catch-all below.
+    match /morningRounds/{docId} { allow read: if isPrivileged(); allow write: if isPrivileged(); }
+
+    // ─── FEEDING LOGS ──────────────────────────────────────────────────────────
+    // Only FeedingLogPage.vue (admin-feeding, staff/admin route) reads this.
+    match /feedingLogs/{docId} { allow read: if isPrivileged(); allow write: if isPrivileged(); }
+
+    // ─── FOSTER HOMES & PLACEMENTS ─────────────────────────────────────────────
+    match /fosters/{docId} { allow read: if isAuth(); allow write: if isPrivileged(); }
+    match /fosterplacements/{docId} { allow read: if isAuth(); allow write: if isPrivileged(); }
+
+    // ─── ADOPTIONS ─────────────────────────────────────────────────────────────
+    // Only AdoptionsPage.vue (admin-adoptions, staff/admin route) reads this.
+    match /adoptions/{docId} { allow read: if isPrivileged(); allow write: if isPrivileged(); }
+
+    // ─── DONATIONS / SANCTUARY LEDGER ──────────────────────────────────────────
+    // Donor giving data is PII — staff/admin only
+    match /donations/{docId} { allow read: if isPrivileged(); allow write: if isPrivileged(); }
+
+    // ─── EOD REPORTS ───────────────────────────────────────────────────────────
+    match /eodReports/{docId} { allow read: if isPrivileged(); allow write: if isPrivileged(); }
+
+    // ─── EMERGENCY CONTACTS ────────────────────────────────────────────────────
+    // Unused by any current page — tightened defensively
+    match /contacts/{docId} { allow read: if isPrivileged(); allow write: if isPrivileged(); }
+
+    // ─── ENCLOSURES ────────────────────────────────────────────────────────────
+    // Unused by any current page — tightened defensively
+    match /enclosures/{docId} { allow read: if isPrivileged(); allow write: if isPrivileged(); }
+
+    // ─── EVENTS ────────────────────────────────────────────────────────────────
+    // Unused by any current page — tightened defensively
+    match /events/{docId} {
+      allow read: if isPrivileged();
+      allow create: if isPrivileged();
+      allow update: if isAuth();
+      allow delete: if isPrivileged();
+    }
+
+    // ─── VOLUNTEER SKILLS ──────────────────────────────────────────────────────
+    // Unused by any current page — tightened defensively
+    match /volunteerskills/{docId} { allow read: if isPrivileged(); allow write: if isPrivileged(); }
+
+    // ─── PEOPLE / CRM ──────────────────────────────────────────────────────────
+    match /people/{docId} { allow read: if isAuth(); allow write: if isPrivileged(); }
+
+    // ─── TRAINING MODULES ──────────────────────────────────────────────────────
+    // Every authenticated user (volunteers included) reads the training hub;
+    // only staff/admin can author/edit/remove modules.
+    match /trainingModules/{docId} { allow read: if isAuth(); allow write: if isPrivileged(); }
+
+    // Quiz results. A volunteer can only read/write their OWN completion
+    // record (checked against the payload's userId); staff/admin can read
+    // everyone's to see who's finished training.
+    match /trainingCompletions/{docId} {
+      allow read: if isPrivileged() || (isAuth() && resource.data.userId == request.auth.uid);
+      allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAuth() && request.resource.data.userId == request.auth.uid;
+      allow delete: if isPrivileged();
+    }
+
+    // Small hand-edited settings docs (e.g. settings/contact for the
+    // Training page's "Questions?" card). Everyone reads, only staff/admin
+    // write.
+    match /settings/{docId} { allow read: if isAuth(); allow write: if isPrivileged(); }
+
+    // Volunteer-submitted questions from the Training page's "Questions?"
+    // card. A volunteer sees only their own; staff/admin see and answer all.
+    match /volunteerQuestions/{docId} {
+      allow read: if isPrivileged() || (isAuth() && resource.data.askedById == request.auth.uid);
+      allow create: if isAuth() && request.resource.data.askedById == request.auth.uid;
+      allow update: if isPrivileged();
+      allow delete: if isPrivileged();
+    }
+
+    // ─── OUTREACH LOG ──────────────────────────────────────────────────────────
+    // Unused by any current page — fully tightened (was open read+write)
+    match /outreach_log/{docId} { allow read: if isPrivileged(); allow write: if isPrivileged(); }
+
+    // ─── ANIMAL RECORDS ────────────────────────────────────────────────────────
+    // Unused by any current page — fully tightened (was open read+write)
+    match /animalcosts/{docId} {
+      allow read: if isPrivileged();
+      allow write: if isPrivileged();
+    }
+
+    match /animalfollowups/{docId} {
+      allow read: if isAuth();
+      allow create: if isAuth();
+      allow update: if isAuth();
+      allow delete: if isPrivileged();
+    }
+
+    // Unused by any current page — the Traits/Assess/Memory animal-detail
+    // tabs have no Firestore calls of their own (UI-only today). Tightened
+    // defensively.
+    match /animalbehavior/{docId} {
+      allow read: if isPrivileged();
+      allow create: if isAuth();
+      allow update: if isPrivileged();
+      allow delete: if isPrivileged();
+    }
+
+    // Unused by any current page — tightened defensively
+    match /animaldocs/{docId} {
+      allow read: if isPrivileged();
+      allow write: if isPrivileged();
+    }
+
+    // ─── TRANSFER PARTNERS ─────────────────────────────────────────────────────
+    // Unused by any current page — tightened defensively
+    match /transferpartners/{docId} {
+      allow read: if isPrivileged();
+      allow write: if isPrivileged();
+    }
+
+    // ─── GRANTS ────────────────────────────────────────────────────────────────
+    // Grant pipeline holds financial and legal material — staff/admin only
+    match /grants/{docId} {
+      allow read: if isPrivileged();
+      allow write: if isPrivileged();
+    }
+
+    // ─── VET VISITS ────────────────────────────────────────────────────────────
+    // Unused by any current page — tightened defensively
+    match /animalvetvisits/{docId} {
+      allow read: if isPrivileged();
+      allow write: if isPrivileged();
+    }
+
+    // ─── SHIFT SCHEDULING ─────────────────────────────────────────────────────
+    // Unused by any current page (task-claiming actually happens on the
+    // `tasks` collection, not this one) — tightened defensively
+    match /shiftslots/{docId} {
+      allow read: if isPrivileged();
+      allow create: if isPrivileged();
+      allow update: if isPrivileged();
+      allow delete: if isPrivileged();
+    }
+
+    match /shiftclaims/{docId} {
+      allow read: if isPrivileged();
+      allow create: if isAuth();
+      allow update: if isAuth() && (
+        resource.data.email == request.auth.token.email || isPrivileged()
+      );
+      allow delete: if isAuth() && (
+        resource.data.email == request.auth.token.email || isPrivileged()
+      );
+    }
+
+    // ─── IN-KIND DONATIONS ────────────────────────────────────────────────────
+    // Unused by any current page — tightened defensively
+    match /inkinddonations/{docId} {
+      allow read: if isPrivileged();
+      allow write: if isPrivileged();
+    }
+
+    // ─── MEDICAL COMPLIANCE ────────────────────────────────────────────────────
+    // Only ComplianceChecklistPage.vue (admin-compliance, staff/admin route)
+    // reads this — Dashboard.vue fetches it for every user but only displays
+    // it behind an admin-only UI gate, so tightening here just makes the
+    // volunteer/staff-without-display-access fetch fail harmlessly.
+    match /compliance/{docId} {
+      allow read: if isPrivileged();
+      allow write: if isPrivileged();
+    }
+
+    // ─── ANIMAL HEALTH METRICS ─────────────────────────────────────────────────
+    match /healthMetrics/{docId} {
+      allow read: if isAuth();
+      allow write: if isPrivileged();
+    }
+
+    // ─── MEDICATION RUNS ───────────────────────────────────────────────────────
+    // Only MedRunPage.vue (admin-med-run, staff/admin route) reads this.
+    match /medRuns/{docId} {
+      allow read: if isPrivileged();
+      allow write: if isPrivileged();
+    }
+
+    // ─── QUARANTINE ────────────────────────────────────────────────────────────
+    // Only QuarantinePage.vue (admin-quarantine, staff/admin route) reads this.
+    match /quarantine/{docId} {
+      allow read: if isPrivileged();
+      allow write: if isPrivileged();
+    }
+
+    // ─── ROUNDS HISTORY ────────────────────────────────────────────────────────
+    // Only RoundsHistoryPage.vue (admin-rounds-history, staff/admin route)
+    // reads this.
+    match /roundsHistory/{docId} {
+      allow read: if isPrivileged();
+      allow write: if isPrivileged();
+    }
+
+    // ─── VOLUNTEER DIRECTORY (shifts) ──────────────────────────────────────────
+    match /volunteers/{docId} {
+      allow read: if isAuth();
+      allow write: if isPrivileged();
+    }
+
+    // ─── ACTIVITY LOG ──────────────────────────────────────────────────────────
+    // Only ActivityLogPage.vue and AnimalPipelinePage.vue (both staff/admin
+    // routes) read this. `create` stays open — stores/people.js and
+    // stores/waivers.js write log entries as a side effect of actions any
+    // signed-in user can trigger, so writing must not be restricted here.
+    match /activityLog/{docId} {
+      allow read: if isPrivileged();
+      allow create: if isAuth();
+      allow update: if isPrivileged();
+      allow delete: if isPrivileged();
+    }
+
+    // ─── ANIMAL DIET ───────────────────────────────────────────────────────────
+    match /animalDiet/{docId} {
+      allow read: if isAuth();
+      allow write: if isPrivileged();
+    }
+
+    // ─── ANIMAL OUTCOMES ───────────────────────────────────────────────────────
+    // Only OutcomesPage.vue (admin-outcomes, staff/admin route) reads this.
+    match /outcomes/{docId} {
+      allow read: if isPrivileged();
+      allow write: if isPrivileged();
+    }
+
+    // ─── LEDGER / DONORS ───────────────────────────────────────────────────────
+    // Full financial ledger and donor CRM (names, emails, giving history) —
+    // staff/admin only. Volunteers have no surface that reads these.
+    match /ledgers/{docId} {
+      allow read: if isPrivileged();
+      allow write: if isPrivileged();
+    }
+
+    match /donors/{docId} {
+      allow read: if isPrivileged();
+      allow write: if isPrivileged();
+    }
+
+    // ─── DIRECT MESSAGES ───────────────────────────────────────────────────────
+    // Only staff/admin read the message archive (MessageTeamPage is an admin
+    // surface); any signed-in user may send. Proper per-recipient reads land
+    // with the communications service rework.
+    match /messages/{docId} {
+      allow read: if isPrivileged();
+      allow create: if isAuth();
+      allow update: if isPrivileged();
+      allow delete: if isPrivileged();
+    }
+
+    // ─── VOLUNTEER APPLICATIONS ────────────────────────────────────────────────
+    match /applications/{docId} {
+      allow read: if isPrivileged();
+      allow create: if isAuth();
+      allow update: if isPrivileged();
+      allow delete: if isPrivileged();
+    }
+
+    // ─── DEFAULT DENY ──────────────────────────────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

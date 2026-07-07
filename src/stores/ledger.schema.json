@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Ledger Entry Schema",
+  "description": "Schema for ledger entries in Firestore",
+  "type": "object",
+  "required": ["description", "category", "type", "amount"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Firestore document ID (auto-generated)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief description of the transaction",
+      "minLength": 1,
+      "maxLength": 255,
+      "examples": [
+        "Heating lamp supplies and equipment",
+        "Veterinary care - health checkups",
+        "Grant received - Wildlife Conservation Fund"
+      ]
+    },
+    "category": {
+      "type": "string",
+      "description": "Category classification",
+      "enum": [
+        "Supplies & Equipment",
+        "Donations",
+        "Medical & Veterinary",
+        "Grants & Funding",
+        "Facility Maintenance",
+        "Food & Nutrition",
+        "Utilities",
+        "Salaries & Wages",
+        "Transportation",
+        "Insurance",
+        "Other"
+      ]
+    },
+    "type": {
+      "type": "string",
+      "description": "Transaction type",
+      "enum": ["income", "expense"]
+    },
+    "amount": {
+      "type": "number",
+      "description": "Dollar amount (positive number)",
+      "minimum": 0,
+      "examples": [245.50, 500.00, 1200.00, 2500.00]
+    },
+    "notes": {
+      "type": "string",
+      "description": "Optional detailed notes about the transaction",
+      "maxLength": 1000,
+      "examples": [
+        "UVB bulbs, heat tape, thermostats for enclosures",
+        "Annual checkups for 8 animals, vaccination records updated"
+      ]
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the entry was created (Firestore server timestamp)"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the entry was last updated"
+    }
+  },
+  "examples": [
+    {
+      "description": "Heating lamp supplies and equipment",
+      "category": "Supplies & Equipment",
+      "type": "expense",
+      "amount": 245.50,
+      "notes": "UVB bulbs, heat tape, thermostats for enclosures",
+      "createdAt": "2026-06-20T00:00:00Z"
+    },
+    {
+      "description": "Monthly food donation from community",
+      "category": "Donations",
+      "type": "income",
+      "amount": 500.00,
+      "notes": "Insects, frozen prey, fresh vegetables",
+      "createdAt": "2026-06-18T00:00:00Z"
+    }
+  ]
+}

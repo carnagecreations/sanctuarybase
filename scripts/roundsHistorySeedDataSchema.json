@@ -1,0 +1,171 @@
+{
+  "description": "Rounds History Seed Data Schema and Examples",
+  "version": "1.0",
+  "collection": "roundsHistory",
+  "records": 5,
+  "dateRange": "2026-06-24 to 2026-06-27",
+  "schema": {
+    "volunteerId": {
+      "type": "string",
+      "description": "Unique volunteer identifier"
+    },
+    "volunteerName": {
+      "type": "string",
+      "description": "Full name of the volunteer"
+    },
+    "shiftId": {
+      "type": "string",
+      "description": "Unique shift identifier"
+    },
+    "shiftType": {
+      "type": "enum",
+      "values": ["morning", "afternoon", "evening"],
+      "description": "Type of shift"
+    },
+    "startTime": {
+      "type": "string",
+      "format": "HH:MM",
+      "description": "Shift start time"
+    },
+    "endTime": {
+      "type": "string",
+      "format": "HH:MM",
+      "description": "Shift end time"
+    },
+    "duration": {
+      "type": "string",
+      "example": "2h 45m",
+      "description": "Calculated shift duration"
+    },
+    "date": {
+      "type": "string",
+      "format": "YYYY-MM-DD",
+      "description": "Date of the round"
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "completedAt": { "type": "string", "format": "HH:MM" },
+          "notes": { "type": "string" },
+          "animalsChecked": { "type": "number" },
+          "feedingCompleted": { "type": "boolean" }
+        }
+      },
+      "description": "Array of facility sections checked during round"
+    },
+    "totalAnimalsChecked": {
+      "type": "number",
+      "description": "Total count of animals checked across all sections"
+    },
+    "issuesCount": {
+      "type": "number",
+      "description": "Number of issues reported"
+    },
+    "issuesReported": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "animalId": { "type": "string" },
+          "type": { "type": "string" },
+          "description": { "type": "string" },
+          "severity": { "type": "enum", "values": ["low", "moderate", "high"] },
+          "reportedAt": { "type": "Date" },
+          "resolution": { "type": "string", "optional": true }
+        }
+      },
+      "description": "Array of issues encountered during round"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Summary notes about the round"
+    },
+    "createdAt": {
+      "type": "Timestamp",
+      "description": "Firestore timestamp when record was created"
+    },
+    "updatedAt": {
+      "type": "Timestamp",
+      "description": "Firestore timestamp when record was last updated"
+    }
+  },
+  "examples": [
+    {
+      "volunteerId": "volunteer_001",
+      "volunteerName": "Sarah Johnson",
+      "shiftId": "shift_morning_001",
+      "shiftType": "morning",
+      "startTime": "07:00",
+      "endTime": "09:45",
+      "duration": "2h 45m",
+      "date": "2026-06-27",
+      "sections": [
+        {
+          "id": "section_1",
+          "name": "North Enclosure",
+          "completedAt": "07:15",
+          "notes": "All animals active and healthy",
+          "animalsChecked": 4,
+          "feedingCompleted": true
+        }
+      ],
+      "totalAnimalsChecked": 14,
+      "issuesCount": 0,
+      "issuesReported": [],
+      "notes": "Smooth morning round. All systems operational.",
+      "createdAt": "2026-06-27T07:00:00Z",
+      "updatedAt": "2026-06-27T09:45:00Z"
+    },
+    {
+      "volunteerId": "volunteer_002",
+      "volunteerName": "Michael Chen",
+      "shiftId": "shift_afternoon_001",
+      "shiftType": "afternoon",
+      "startTime": "14:00",
+      "endTime": "16:30",
+      "duration": "2h 30m",
+      "date": "2026-06-26",
+      "sections": [],
+      "totalAnimalsChecked": 14,
+      "issuesCount": 1,
+      "issuesReported": [
+        {
+          "animalId": "animal_042",
+          "type": "feeding_issue",
+          "description": "One ball python showing reduced appetite",
+          "severity": "moderate",
+          "reportedAt": "2026-06-26T14:50:00Z"
+        }
+      ],
+      "notes": "Afternoon round completed. One snake not eating - monitor closely.",
+      "createdAt": "2026-06-26T14:00:00Z",
+      "updatedAt": "2026-06-26T16:30:00Z"
+    }
+  ],
+  "volunteers": [
+    "volunteer_001 - Sarah Johnson",
+    "volunteer_002 - Michael Chen",
+    "volunteer_003 - Emma Rodriguez",
+    "volunteer_004 - David Thompson"
+  ],
+  "facilities": [
+    "North Enclosure",
+    "Quarantine Area",
+    "Central Habitat",
+    "South Enclosure"
+  ],
+  "issueTypes": [
+    "feeding_issue",
+    "temperature_issue",
+    "equipment_malfunction"
+  ],
+  "severities": [
+    "low",
+    "moderate",
+    "high"
+  ]
+}

@@ -1,0 +1,200 @@
+==========================================
+HOW TO ADD BITE REPORTS SAMPLE DATA
+==========================================
+
+OPTION 1: BROWSER CONSOLE (EASIEST - 30 SECONDS)
+================================================
+
+Steps:
+1. Start the SB v2 app locally (npm run dev or your command)
+2. Navigate to http://localhost:5173 (or your app URL)
+3. Press F12 to open Developer Tools
+4. Click the "Console" tab
+5. Paste this code:
+
+import { seedBiteReports } from '/src/utils/seedBiteReports.js'
+seedBiteReports().then(results => console.log('✓ Created', results.length, 'reports'))
+
+6. Press Enter
+7. Wait 2-3 seconds for completion
+8. Navigate to Admin Hub > Bite Reports page
+9. You should see 3 pending + 2 reviewed reports
+
+---
+
+OPTION 2: NODE.JS ADMIN SDK (RECOMMENDED FOR CI/CD)
+===================================================
+
+Requirements:
+- Node.js installed
+- Firebase service account key (.firebase/serviceAccountKey.json)
+
+Steps:
+1. Download service account key:
+   - Go to Firebase Console > Project Settings
+   - Service Accounts tab
+   - Click "Generate New Private Key"
+   - Save to: .firebase/serviceAccountKey.json
+
+2. Install Firebase Admin SDK:
+   npm install firebase-admin
+
+3. Run:
+   node functions/seed-bite-reports.js
+
+4. Output will show:
+   - Started seeding
+   - Created [animal name] records
+   - Completed count
+
+---
+
+OPTION 3: FIREBASE REST API (NO SDK)
+====================================
+
+Steps:
+1. Run:
+   node seed-bite-reports-rest.js
+
+2. Will create records via REST API
+3. Note: Requires Firestore rules to allow writes
+
+---
+
+WHAT GETS CREATED
+=================
+
+5 Records Total:
+
+PENDING (3):
+  1. Venom (Ball Python) - Sarah Johnson - Minor bite, hand placement error
+  2. Spike (Bearded Dragon) - James Wilson - Minor bite, stress response
+  3. Ruby (Snapping Turtle) - Emily Rodriguez - Moderate bite, required stitches
+
+REVIEWED (2):
+  4. Venom (Ball Python) - Alexandra Torres - Minor, preventable, training recommended
+  5. Siam (King Cobra) - Christopher Lee - High severity, protocol breach, hospitalized
+
+---
+
+HOW TO VERIFY
+=============
+
+Method 1: In App
+- Go to Admin Hub > Bite Reports
+- Should see "Pending review" section with 3 reports
+- Should see "Reviewed" section with 2 reports
+
+Method 2: Firebase Console
+- Go to https://console.firebase.google.com
+- Select "sanctuarybasev2" project
+- Firestore Database
+- Look for "biteReports" collection
+- Click to expand and see all 5 documents
+
+---
+
+HOW TO DELETE
+=============
+
+If you want to remove the sample data:
+
+Option A: Firebase Console (recommended)
+1. Go to Firebase Console > biteReports collection
+2. Right-click each document
+3. Click Delete
+4. Confirm
+
+Option B: Code (advanced)
+Create a delete script with deleteDoc() or batch delete
+
+---
+
+DATA FIELDS INCLUDED
+====================
+
+Each record has:
+- animalId: References the animal (e.g., "animal-001")
+- animalName: Display name (e.g., "Venom")
+- emoji: Animal type emoji (e.g., "🐍")
+- personId: Who was bitten
+- victim: Victim's name
+- victimRole: "Volunteer" or "Staff"
+- date: Date in YYYY-MM-DD format
+- description: What happened
+- severity: "Minor", "Moderate", "High"
+- location: Body location bitten
+- status: "Pending" or "Reviewed"
+- injuryDetails: Medical description
+- reportedAt: Timestamp
+- createdAt: Timestamp
+- witnesses: Array of names
+- firstAidProvided: First aid details
+- medicalTreatmentRequired: Boolean
+- [If Reviewed] reviewedAt, reviewedBy, reviewNotes
+
+---
+
+TROUBLESHOOTING
+===============
+
+"Permission denied" error?
+  → Check Firestore security rules
+  → Try browser console method first
+  → Ensure you're logged in to Firebase
+
+"Collection not found"?
+  → Normal! The collection is auto-created
+  → Just means it's empty until seeded
+
+Nothing appears in app?
+  → Refresh the page (F5)
+  → Check browser console for errors
+  → Try a different method
+
+Data doesn't match?
+  → Check your Firestore Console
+  → Make sure records are there
+  → Clear browser cache if needed
+
+---
+
+FILES AVAILABLE
+===============
+
+src/utils/seedBiteReports.js     - The main utility (use this!)
+functions/seed-bite-reports.js   - Admin SDK version
+seed-bite-reports-rest.js        - REST API version
+SEED_DATA_GUIDE.md               - Full documentation
+BITE_REPORTS_SAMPLE_DATA.json    - JSON preview of data
+SEED_DATA_QUICK_START.txt        - Quick reference
+HOW_TO_SEED.txt                  - This file
+
+---
+
+RECOMMENDED APPROACH
+====================
+
+1. Start with OPTION 1 (Browser Console) - fastest
+2. If that works, you're done!
+3. If you need automation, use OPTION 2 (Admin SDK)
+
+Most developers prefer the browser console method because:
+- No setup required
+- Immediate visual feedback
+- Works from any machine
+- No credentials needed
+
+---
+
+NEXT STEPS
+==========
+
+After seeding:
+1. Build out the Bite Report form to create new reports
+2. Implement the review workflow
+3. Add filters for severity/status/date
+4. Set up notifications for new reports
+5. Create export functionality (PDF, CSV)
+
+See SEED_DATA_GUIDE.md for more details.

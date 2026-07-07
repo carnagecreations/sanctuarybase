@@ -1,0 +1,43 @@
+Phase 4 Priority 2-4: Add ledger forms, supply styling, medical tabs with real data
+
+Priority 2 - LedgerPage: Wire add/edit/delete modals for ledger entries
+- Create modal for adding/editing ledger entries
+- Wire + New entry button to open modal
+- Form fields: description, category, type (income/expense), amount, date
+- Click rows to edit, delete button with confirmation
+- Proper error handling and loading states
+- Design system styling
+
+Priority 3 - SupplyInventoryPage: Improve styling with design system
+- Update colors to use CSS variables (mint, coral, amber, ink)
+- Better form styling with proper padding and focus states
+- Improved table styling with hover effects
+- Low-stock items visually prominent with background color
+- Consistent button styling across all actions
+- Modern modal design matching design system
+
+Priority 4 - HealthTab: Implement real medical records with Firestore
+- Wire to useMedicalRecordsStore for real data
+- Add modal for logging vet visits (date, reason, findings, vitals, recheck)
+- Medical events with quick-add buttons for different event types
+- Edit and delete functionality for all entries
+- Professional medical layout with proper spacing
+- Timestamps and organized display
+
+Priority 4 - WeightTab: Wire healthMetrics store with real data
+- Connect to useHealthMetricsStore for weight records
+- Log weight with date, unit (lbs/kg), optional notes
+- Display current weight with trend indicator (up/down/stable)
+- Visual weight chart showing trend over time
+- Sortable history with delete capability
+- Professional medical-grade display
+
+Priority 4 - MetTab: Wire meet & greet and testimonials
+- Connect to animal store for meets data
+- Add modal for logging meet & greets with outcome tracking
+- Testimonial input and display
+- Delete functionality for both meets and testimonials
+- QR code generation for animal profile sharing
+- Professional adoption tracking layout
+
+Co-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>

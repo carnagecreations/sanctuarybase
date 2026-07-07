@@ -1,0 +1,110 @@
+{
+  "recordCount": 5,
+  "pendingCount": 3,
+  "reviewedCount": 2,
+  "records": [
+    {
+      "order": 1,
+      "animal": "Venom (Ball Python)",
+      "emoji": "🐍",
+      "victim": "Sarah Johnson",
+      "victimRole": "Volunteer",
+      "date": "2026-06-25",
+      "status": "Pending",
+      "severity": "Minor",
+      "location": "Front left leg",
+      "description": "Ball python struck when hand was placed too quickly in enclosure during feeding.",
+      "injuryDetails": "Two small puncture marks, minimal bleeding",
+      "medicalTreatmentRequired": false,
+      "witnesses": ["Michael Chen"],
+      "firstAidProvided": "Cleaned with soap and water, applied bandage"
+    },
+    {
+      "order": 2,
+      "animal": "Spike (Bearded Dragon)",
+      "emoji": "🦎",
+      "victim": "James Wilson",
+      "victimRole": "Staff",
+      "date": "2026-06-26",
+      "status": "Pending",
+      "severity": "Minor",
+      "location": "Right index finger",
+      "description": "Bearded dragon bit finger during aggressive feeding response. Animal was stressed.",
+      "injuryDetails": "Shallow bite with slight bleeding, no infection signs",
+      "medicalTreatmentRequired": false,
+      "witnesses": [],
+      "firstAidProvided": "Antiseptic applied, bandaged"
+    },
+    {
+      "order": 3,
+      "animal": "Ruby (Snapping Turtle)",
+      "emoji": "🐢",
+      "victim": "Emily Rodriguez",
+      "victimRole": "Volunteer",
+      "date": "2026-06-27",
+      "status": "Pending",
+      "severity": "Moderate",
+      "location": "Left thumb",
+      "description": "Snapping turtle bit thumb while being transferred to new enclosure. Turtle was defensive.",
+      "injuryDetails": "Deep puncture wound requiring 3 stitches at urgent care",
+      "medicalTreatmentRequired": true,
+      "medicalFollowUp": "Stitches removed 2026-07-04",
+      "witnesses": ["Sarah Johnson", "David Park"],
+      "firstAidProvided": "Direct pressure applied for 10 minutes, wound cleaned, referred to urgent care"
+    },
+    {
+      "order": 4,
+      "animal": "Venom (Ball Python)",
+      "emoji": "🐍",
+      "victim": "Alexandra Torres",
+      "victimRole": "Volunteer",
+      "date": "2026-05-15",
+      "status": "Reviewed",
+      "severity": "Minor",
+      "location": "Right palm",
+      "description": "Ball python defensive strike during handling. Handler moved too quickly past head.",
+      "injuryDetails": "Two small puncture marks, no complications",
+      "medicalTreatmentRequired": false,
+      "witnesses": ["Michael Chen"],
+      "firstAidProvided": "Cleaned with soap and water, applied antibiotic ointment",
+      "reviewedAt": "2026-05-16T10:00:00Z",
+      "reviewedBy": "admin@yumareptiles.com",
+      "reviewNotes": "Preventable incident. Handler training recommended before future handling."
+    },
+    {
+      "order": 5,
+      "animal": "Siam (King Cobra)",
+      "emoji": "🐍",
+      "victim": "Christopher Lee",
+      "victimRole": "Staff",
+      "date": "2026-04-10",
+      "status": "Reviewed",
+      "severity": "High",
+      "location": "Left forearm",
+      "description": "King cobra struck during routine tank cleaning. Animal was provoked by movement.",
+      "injuryDetails": "Severe puncture wounds, swelling and bruising. Treated with antivenin at hospital.",
+      "medicalTreatmentRequired": true,
+      "medicalFollowUp": "Hospitalized for 3 days, antivenin administered, full recovery",
+      "witnesses": ["Sarah Johnson", "Michael Chen", "David Park"],
+      "firstAidProvided": "Immobilized limb, ice applied, emergency transport to hospital",
+      "reviewedAt": "2026-04-15T14:30:00Z",
+      "reviewedBy": "admin@yumareptiles.com",
+      "reviewNotes": "Serious incident. Protocol breach identified. Enhanced safety procedures implemented."
+    }
+  ],
+  "summary": {
+    "totalIncidents": 5,
+    "animalInvolved": ["Venom (Ball Python)", "Spike (Bearded Dragon)", "Ruby (Snapping Turtle)", "Siam (King Cobra)"],
+    "severityBreakdown": {
+      "Minor": 3,
+      "Moderate": 1,
+      "High": 1
+    },
+    "statusBreakdown": {
+      "Pending": 3,
+      "Reviewed": 2
+    },
+    "volunteerInvolved": 3,
+    "staffInvolved": 2
+  }
+}

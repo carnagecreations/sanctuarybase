@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seed Ledger Data - SanctuaryBase</title>
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      margin-top: 0;
+    }
+    .description {
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .button {
+      background: #4CAF50;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-bottom: 20px;
+    }
+    .button:hover {
+      background: #45a049;
+    }
+    .button:disabled {
+      background: #cccccc;
+      cursor: not-allowed;
+    }
+    .message {
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    .message.show {
+      display: block;
+    }
+    .message.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .message.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    .results {
+      margin-top: 20px;
+    }
+    .results h3 {
+      margin-top: 0;
+      color: #333;
+    }
+    .results ul {
+      list-style: none;
+      padding: 0;
+    }
+    .results li {
+      background: #f9f9f9;
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: 4px;
+      border-left: 3px solid #4CAF50;
+      font-size: 13px;
+    }
+    .results small {
+      display: block;
+      color: #999;
+      margin-top: 4px;
+      font-size: 11px;
+    }
+    .amount {
+      font-weight: 600;
+      color: #4CAF50;
+    }
+    .expense {
+      color: #e74c3c;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Seed Ledger Data</h1>
+
+    <div class="description">
+      <p>This page will add 5 sample ledger entries to your Firestore database for testing and demonstration purposes.</p>
+      <p><strong>Sample entries include:</strong></p>
+      <ul>
+        <li>Supplies & Equipment expenses</li>
+        <li>Donation income</li>
+        <li>Medical & Veterinary expenses</li>
+        <li>Grants & Funding income</li>
+        <li>Facility Maintenance expenses</li>
+      </ul>
+    </div>
+
+    <button class="button" id="seedButton" onclick="seedLedgerData()">Seed Ledger Data</button>
+
+    <div class="message" id="message"></div>
+
+    <div class="results" id="results" style="display: none;">
+      <h3>Added Entries:</h3>
+      <ul id="resultsList"></ul>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js'
+    import { getAuth } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js'
+    import { getFirestore, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js'
+
+    const firebaseConfig = {
+      apiKey: 'AIzaSyDxOOKDrFfCGBRENNSsFTmau0v7U144vrw',
+      authDomain: 'sanctuarybasev2.firebaseapp.com',
+      projectId: 'sanctuarybasev2',
+      storageBucket: 'sanctuarybasev2.firebasestorage.app',
+      messagingSenderId: '701865805759',
+      appId: '1:701865805759:web:592f9bd6445520018e830a',
+    }
+
+    const app = initializeApp(firebaseConfig)
+    const auth = getAuth(app)
+    const db = getFirestore(app)
+
+    const sampleLedgerData = [
+      {
+        description: 'Heating lamp supplies and equipment',
+        category: 'Supplies & Equipment',
+        type: 'expense',
+        amount: 245.50,
+        notes: 'UVB bulbs, heat tape, thermostats for enclosures'
+      },
+      {
+        description: 'Monthly food donation from community',
+        category: 'Donations',
+        type: 'income',
+        amount: 500.00,
+        notes: 'Insects, frozen prey, fresh vegetables'
+      },
+      {
+        description: 'Veterinary care - health checkups',
+        category: 'Medical & Veterinary',
+        type: 'expense',
+        amount: 1200.00,
+        notes: 'Annual checkups for 8 animals, vaccination records updated'
+      },
+      {
+        description: 'Grant received - Wildlife Conservation Fund',
+        category: 'Grants & Funding',
+        type: 'income',
+        amount: 2500.00,
+        notes: 'Q2 wildlife rehabilitation grant'
+      },
+      {
+        description: 'Enclosure renovation and maintenance',
+        category: 'Facility Maintenance',
+        type: 'expense',
+        amount: 875.25,
+        notes: 'Glass cleaning, substrate replacement, structural repairs'
+      }
+    ]
+
+    window.seedLedgerData = async function() {
+      const button = document.getElementById('seedButton')
+      const messageDiv = document.getElementById('message')
+      const resultsDiv = document.getElementById('results')
+      const resultsList = document.getElementById('resultsList')
+
+      button.disabled = true
+      messageDiv.textContent = ''
+      messageDiv.className = 'message'
+      resultsList.innerHTML = ''
+      resultsDiv.style.display = 'none'
+
+      try {
+        // Check if user is authenticated
+        if (!auth.currentUser) {
+          throw new Error('You must be logged in to seed data. Please log in first.')
+        }
+
+        messageDiv.textContent = 'Seeding ledger data...'
+        messageDiv.className = 'message show'
+
+        const ledgersCollection = collection(db, 'ledgers')
+        const addedEntries = []
+
+        for (const entry of sampleLedgerData) {
+          const docRef = await addDoc(ledgersCollection, {
+            ...entry,
+            createdAt: serverTimestamp()
+          })
+          addedEntries.push({ id: docRef.id, ...entry })
+        }
+
+        // Display results
+        messageDiv.textContent = `Successfully added ${addedEntries.length} ledger entries!`
+        messageDiv.className = 'message show success'
+
+        addedEntries.forEach(entry => {
+          const li = document.createElement('li')
+          const typeClass = entry.type === 'income' ? '' : 'expense'
+          li.innerHTML = `
+            <strong>${entry.description}</strong>
+            <br>
+            <span class="amount ${typeClass}">${entry.type === 'income' ? '+' : '-'}$${entry.amount.toFixed(2)}</span>
+            <small>Category: ${entry.category} | ID: ${entry.id}</small>
+          `
+          resultsList.appendChild(li)
+        })
+
+        resultsDiv.style.display = 'block'
+      } catch (error) {
+        console.error('Error seeding ledger data:', error)
+        messageDiv.textContent = `Error: ${error.message}`
+        messageDiv.className = 'message show error'
+      } finally {
+        button.disabled = false
+      }
+    }
+
+    // Check auth state on page load
+    auth.onAuthStateChanged(user => {
+      const button = document.getElementById('seedButton')
+      if (!user) {
+        button.disabled = true
+        const messageDiv = document.getElementById('message')
+        messageDiv.textContent = 'You must be logged in to use this tool. Please log in first.'
+        messageDiv.className = 'message show error'
+      }
+    })
+  </script>
+</body>
+</html>

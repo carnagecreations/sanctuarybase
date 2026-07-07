@@ -1,0 +1,46 @@
+BITE REPORTS SEED DATA - QUICK START
+====================================
+
+FASTEST METHOD (Browser Console):
+1. Open the app in browser
+2. Press F12 (Developer Tools)
+3. Go to Console tab
+4. Paste and run:
+   import { seedBiteReports } from '@/utils/seedBiteReports'
+   seedBiteReports()
+
+WHAT YOU GET:
+- 5 realistic bite report records
+- 3 Pending (awaiting review)
+- 2 Reviewed (completed)
+- Various animals: Ball Python, Bearded Dragon, Snapping Turtle, King Cobra
+- Different severity levels: Minor, Moderate, High
+
+FILES CREATED:
+✓ src/utils/seedBiteReports.js       - Browser utility (easiest)
+✓ functions/seed-bite-reports.js     - Node.js Admin SDK method
+✓ seed-bite-reports-rest.js          - Firebase REST API method
+✓ SEED_DATA_GUIDE.md                 - Complete documentation
+✓ SEED_DATA_QUICK_START.txt          - This file
+
+DATA STRUCTURE:
+- animalId, animalName, emoji
+- personId, victim, victimRole
+- date, description, severity, location
+- status (Pending/Reviewed)
+- injuryDetails, witnesses
+- firstAidProvided, medicalTreatmentRequired
+- reportedAt, createdAt
+- reviewedAt, reviewedBy, reviewNotes (for reviewed reports)
+
+VERIFY:
+1. Refresh Bite Reports page
+2. Should see 3 pending + 2 reviewed reports
+3. Check Firebase Console > Firestore > biteReports collection
+
+TROUBLESHOOTING:
+- If permission denied: check Firestore security rules
+- If nothing appears: refresh page, check browser console
+- Full details in SEED_DATA_GUIDE.md
+
+See SEED_DATA_GUIDE.md for detailed information and other methods.

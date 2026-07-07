@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Data Seeding - Sanctuary Base</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 600px;
+      width: 100%;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .auth-status {
+      background: #f5f5f5;
+      border-left: 4px solid #667eea;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .auth-status.authenticated {
+      background: #e8f5e9;
+      border-left-color: #4caf50;
+    }
+
+    .auth-status.authenticated .status-text {
+      color: #2e7d32;
+    }
+
+    .auth-status .status-label {
+      color: #999;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .auth-status .status-text {
+      color: #d32f2f;
+      font-weight: 500;
+    }
+
+    .auth-status .user-email {
+      color: #666;
+      margin-top: 5px;
+      font-size: 13px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+      opacity: 0.6;
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+      border: 1px solid #ddd;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    .btn-secondary:active {
+      background: #d0d0d0;
+    }
+
+    .output {
+      background: #1e1e1e;
+      color: #00ff00;
+      padding: 20px;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 20px;
+      line-height: 1.5;
+      display: none;
+    }
+
+    .output.active {
+      display: block;
+    }
+
+    .output-line {
+      padding: 2px 0;
+    }
+
+    .output-line.info {
+      color: #00ff00;
+    }
+
+    .output-line.success {
+      color: #00ff00;
+      font-weight: bold;
+    }
+
+    .output-line.error {
+      color: #ff4444;
+    }
+
+    .output-line.warn {
+      color: #ffaa00;
+    }
+
+    .message {
+      padding: 15px;
+      border-radius: 6px;
+      margin-top: 20px;
+      display: none;
+      font-size: 14px;
+    }
+
+    .message.active {
+      display: block;
+    }
+
+    .message.success {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border: 1px solid #4caf50;
+    }
+
+    .message.error {
+      background: #ffebee;
+      color: #c62828;
+      border: 1px solid #f44336;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 4px;
+      height: 4px;
+      background: currentColor;
+      border-radius: 50%;
+      animation: blink 1.3s infinite;
+      margin-left: 5px;
+    }
+
+    @keyframes blink {
+      0%, 20%, 50%, 80%, 100% {
+        opacity: 1;
+      }
+      40% {
+        opacity: 0.3;
+      }
+      60% {
+        opacity: 0.5;
+      }
+    }
+
+    .info-box {
+      background: #e3f2fd;
+      border-left: 4px solid #2196f3;
+      padding: 15px;
+      border-radius: 4px;
+      margin-top: 20px;
+      font-size: 13px;
+      color: #1565c0;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Admin Data Seeding</h1>
+    <p class="subtitle">Seed realistic test data to Firestore collections</p>
+
+    <div class="auth-status" id="authStatus">
+      <div class="status-label">Authentication Status</div>
+      <div class="status-text">Not Authenticated</div>
+    </div>
+
+    <div class="controls">
+      <button class="btn-primary" id="seedBtn" onclick="handleSeedAll()" disabled>
+        Seed Admin Collections
+      </button>
+      <button class="btn-secondary" id="logoutBtn" onclick="handleLogout()" style="display: none;">
+        Logout
+      </button>
+    </div>
+
+    <div class="message" id="message"></div>
+
+    <div class="output" id="output"></div>
+
+    <div class="info-box">
+      <strong>What this does:</strong>
+      <ul style="margin: 10px 0 0 20px;">
+        <li>Seeds 5 bite reports with various severity levels</li>
+        <li>Seeds 4 morning feeding rounds</li>
+        <li>Seeds 8 team messages with volunteer recipients</li>
+        <li>Data is realistic and based on sanctuary operations</li>
+        <li>Check browser console for detailed logs</li>
+      </ul>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+    import { getFirestore, collection, addDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: 'AIzaSyDxOOKDrFfCGBRENNSsFTmau0v7U144vrw',
+      authDomain: 'sanctuarybasev2.firebaseapp.com',
+      projectId: 'sanctuarybasev2',
+      storageBucket: 'sanctuarybasev2.firebasestorage.app',
+      messagingSenderId: '701865805759',
+      appId: '1:701865805759:web:592f9bd6445520018e830a',
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Seed data
+    const biteReportsSeedData = [
+      {
+        animalId: 'animal-001',
+        animalName: 'Venom',
+        emoji: '🐍',
+        personId: 'person-001',
+        victim: 'Sarah Johnson',
+        victimRole: 'Volunteer',
+        date: '2026-06-25',
+        description: 'Ball python struck when hand was placed too quickly in enclosure during feeding.',
+        severity: 'Minor',
+        location: 'Front left leg',
+        status: 'Pending',
+        injuryDetails: 'Two small puncture marks, minimal bleeding',
+        reportedAt: new Date('2026-06-25T14:30:00Z'),
+        createdAt: new Date('2026-06-25T14:30:00Z'),
+        witnesses: ['Michael Chen'],
+        firstAidProvided: 'Cleaned with soap and water, applied bandage',
+        medicalTreatmentRequired: false,
+      },
+      {
+        animalId: 'animal-002',
+        animalName: 'Spike',
+        emoji: '🦎',
+        personId: 'person-002',
+        victim: 'James Wilson',
+        victimRole: 'Staff',
+        date: '2026-06-26',
+        description: 'Bearded dragon bit finger during aggressive feeding response. Animal was stressed.',
+        severity: 'Minor',
+        location: 'Right index finger',
+        status: 'Pending',
+        injuryDetails: 'Shallow bite with slight bleeding, no infection signs',
+        reportedAt: new Date('2026-06-26T10:15:00Z'),
+        createdAt: new Date('2026-06-26T10:15:00Z'),
+        witnesses: [],
+        firstAidProvided: 'Antiseptic applied, bandaged',
+        medicalTreatmentRequired: false,
+      },
+      {
+        animalId: 'animal-003',
+        animalName: 'Ruby',
+        emoji: '🐢',
+        personId: 'person-003',
+        victim: 'Emily Rodriguez',
+        victimRole: 'Volunteer',
+        date: '2026-06-27',
+        description: 'Snapping turtle bit thumb while being transferred to new enclosure. Turtle was defensive.',
+        severity: 'Moderate',
+        location: 'Left thumb',
+        status: 'Pending',
+        injuryDetails: 'Deep puncture wound requiring 3 stitches at urgent care',
+        reportedAt: new Date('2026-06-27T09:45:00Z'),
+        createdAt: new Date('2026-06-27T09:45:00Z'),
+        witnesses: ['Sarah Johnson', 'David Park'],
+        firstAidProvided: 'Direct pressure applied for 10 minutes, wound cleaned, referred to urgent care',
+        medicalTreatmentRequired: true,
+        medicalFollowUp: 'Stitches removed 2026-07-04',
+      },
+      {
+        animalId: 'animal-001',
+        animalName: 'Venom',
+        emoji: '🐍',
+        personId: 'person-004',
+        victim: 'Alexandra Torres',
+        victimRole: 'Volunteer',
+        date: '2026-05-15',
+        description: 'Ball python defensive strike during handling. Handler moved too quickly past head.',
+        severity: 'Minor',
+        location: 'Right palm',
+        status: 'Reviewed',
+        injuryDetails: 'Two small puncture marks, no complications',
+        reportedAt: new Date('2026-05-15T16:20:00Z'),
+        createdAt: new Date('2026-05-15T16:20:00Z'),
+        witnesses: ['Michael Chen'],
+        firstAidProvided: 'Cleaned with soap and water, applied antibiotic ointment',
+        medicalTreatmentRequired: false,
+        reviewedAt: new Date('2026-05-16T10:00:00Z'),
+        reviewedBy: 'admin@yumareptiles.com',
+        reviewNotes: 'Preventable incident. Handler training recommended before future handling.',
+      },
+      {
+        animalId: 'animal-004',
+        animalName: 'Siam',
+        emoji: '🐍',
+        personId: 'person-005',
+        victim: 'Christopher Lee',
+        victimRole: 'Staff',
+        date: '2026-04-10',
+        description: 'King cobra struck during routine tank cleaning. Animal was provoked by movement.',
+        severity: 'High',
+        location: 'Left forearm',
+        status: 'Reviewed',
+        injuryDetails: 'Severe puncture wounds, swelling and bruising. Treated with antivenin at hospital.',
+        reportedAt: new Date('2026-04-10T13:00:00Z'),
+        createdAt: new Date('2026-04-10T13:00:00Z'),
+        witnesses: ['Sarah Johnson', 'Michael Chen', 'David Park'],
+        firstAidProvided: 'Immobilized limb, ice applied, emergency transport to hospital',
+        medicalTreatmentRequired: true,
+        medicalFollowUp: 'Hospitalized for 3 days, antivenin administered, full recovery',
+        reviewedAt: new Date('2026-04-15T14:30:00Z'),
+        reviewedBy: 'admin@yumareptiles.com',
+        reviewNotes: 'Serious incident. Protocol breach identified. Enhanced safety procedures implemented.',
+      },
+    ];
+
+    const roundsSeedData = [
+      {
+        type: 'morning',
+        date: '2026-06-28',
+        startTime: '08:00',
+        endTime: '10:30',
+        assignedTo: 'Sarah Johnson',
+        status: 'Completed',
+        notes: 'All feeding stations restocked. Water changed in 12 enclosures.',
+        animals: [
+          { id: 'animal-001', name: 'Venom', type: 'Ball Python', feedingStatus: 'Fed' },
+          { id: 'animal-002', name: 'Spike', type: 'Bearded Dragon', feedingStatus: 'Fed' },
+          { id: 'animal-003', name: 'Ruby', type: 'Snapping Turtle', feedingStatus: 'Offered' },
+        ],
+        createdAt: new Date('2026-06-28T08:00:00Z'),
+        completedAt: new Date('2026-06-28T10:30:00Z'),
+      },
+      {
+        type: 'morning',
+        date: '2026-06-27',
+        startTime: '08:00',
+        endTime: '10:15',
+        assignedTo: 'Michael Chen',
+        status: 'Completed',
+        notes: 'Emergency feeding for two animals. One animal showed stress response.',
+        animals: [
+          { id: 'animal-004', name: 'Siam', type: 'King Cobra', feedingStatus: 'Fed' },
+          { id: 'animal-005', name: 'Scout', type: 'Corn Snake', feedingStatus: 'Fed' },
+        ],
+        createdAt: new Date('2026-06-27T08:00:00Z'),
+        completedAt: new Date('2026-06-27T10:15:00Z'),
+      },
+      {
+        type: 'morning',
+        date: '2026-06-26',
+        startTime: '08:00',
+        endTime: '10:45',
+        assignedTo: 'David Park',
+        status: 'Completed',
+        notes: 'Regular morning round. All animals healthy and responsive.',
+        animals: [
+          { id: 'animal-001', name: 'Venom', type: 'Ball Python', feedingStatus: 'Fed' },
+          { id: 'animal-006', name: 'Luna', type: 'Boa Constrictor', feedingStatus: 'Fed' },
+          { id: 'animal-007', name: 'Ziggy', type: 'Leopard Gecko', feedingStatus: 'Fed' },
+          { id: 'animal-002', name: 'Spike', type: 'Bearded Dragon', feedingStatus: 'Offered' },
+        ],
+        createdAt: new Date('2026-06-26T08:00:00Z'),
+        completedAt: new Date('2026-06-26T10:45:00Z'),
+      },
+      {
+        type: 'morning',
+        date: '2026-06-25',
+        startTime: '08:00',
+        endTime: '10:20',
+        assignedTo: 'Emily Rodriguez',
+        status: 'Completed',
+        notes: 'Morning round completed. Noted abnormal behavior in enclosure 7.',
+        animals: [
+          { id: 'animal-003', name: 'Ruby', type: 'Snapping Turtle', feedingStatus: 'Fed' },
+          { id: 'animal-008', name: 'Hunter', type: 'Reticulated Python', feedingStatus: 'Skipped' },
+        ],
+        createdAt: new Date('2026-06-25T08:00:00Z'),
+        completedAt: new Date('2026-06-25T10:20:00Z'),
+      },
+    ];
+
+    // Sample volunteer IDs for message seeding
+    const SAMPLE_VOLUNTEER_IDS = [
+      'vol-001', 'vol-002', 'vol-003', 'vol-004', 'vol-005', 'vol-006', 'vol-007', 'vol-008'
+    ];
+
+    function getRandomVolunteers(min = 1, max = 4) {
+      const count = Math.floor(Math.random() * (max - min + 1)) + min;
+      const shuffled = [...SAMPLE_VOLUNTEER_IDS].sort(() => 0.5 - Math.random());
+      return shuffled.slice(0, count);
+    }
+
+    function getDateDaysAgo(daysAgo) {
+      const date = new Date();
+      date.setDate(date.getDate() - daysAgo);
+      return date;
+    }
+
+    const messagesSeedData = [
+      {
+        text: 'Good morning team! Remember morning rounds start at 7:30 AM. Please check water temperatures and feeding schedules for the pythons section.',
+        sentBy: 'admin@yumareptiles.com',
+        sentAt: getDateDaysAgo(0),
+        recipientType: 'all',
+        recipients: getRandomVolunteers(3, 5),
+        read: false
+      },
+      {
+        text: 'URGENT: We need coverage for the afternoon shift today (3 PM - 7 PM). Anyone available? Please let me know ASAP.',
+        sentBy: 'admin@yumareptiles.com',
+        sentAt: getDateDaysAgo(0),
+        recipientType: 'online',
+        recipients: getRandomVolunteers(2, 4),
+        read: false
+      },
+      {
+        text: 'Health Update: Ruby (Corn Snake) is recovering well from her respiratory treatment. Continue monitoring for any breathing changes. Dr. Chen will check in on Thursday.',
+        sentBy: 'admin@yumareptiles.com',
+        sentAt: getDateDaysAgo(1),
+        recipientType: 'specific',
+        recipients: getRandomVolunteers(1, 3),
+        read: false
+      },
+      {
+        text: 'Follow-up: Did everyone get a chance to review the new handling protocols I shared yesterday? Please confirm you\'ve reviewed them by end of day.',
+        sentBy: 'admin@yumareptiles.com',
+        sentAt: getDateDaysAgo(1),
+        recipientType: 'all',
+        recipients: getRandomVolunteers(4, 6),
+        read: false
+      },
+      {
+        text: 'Feeding reminder: The ball pythons in enclosure 3-5 are on a feeding schedule every 5 days. Last fed on June 25. Next feeding due June 30. Do NOT skip.',
+        sentBy: 'admin@yumareptiles.com',
+        sentAt: getDateDaysAgo(2),
+        recipientType: 'specific',
+        recipients: getRandomVolunteers(2, 3),
+        read: false
+      },
+      {
+        text: 'Great work on EOD reports this week, team! The documentation has been excellent. Keep up the attention to detail.',
+        sentBy: 'admin@yumareptiles.com',
+        sentAt: getDateDaysAgo(2),
+        recipientType: 'all',
+        recipients: getRandomVolunteers(3, 5),
+        read: false
+      },
+      {
+        text: 'Announcement: We have a new arrival - a juvenile bearded dragon (Sunny). Please DO NOT handle until full health assessment is complete. Assessment scheduled for tomorrow at 10 AM.',
+        sentBy: 'admin@yumareptiles.com',
+        sentAt: getDateDaysAgo(3),
+        recipientType: 'all',
+        recipients: getRandomVolunteers(5, 8),
+        read: false
+      },
+      {
+        text: 're: Equipment maintenance - The heat lamp in Section 2 needs replacement. Ordered new bulb and should arrive by Friday. Please monitor temperature logs until then.',
+        sentBy: 'admin@yumareptiles.com',
+        sentAt: getDateDaysAgo(3),
+        recipientType: 'specific',
+        recipients: getRandomVolunteers(1, 2),
+        read: false
+      }
+    ];
+
+    // Global functions
+    window.handleSeedAll = async function () {
+      await seedAllCollections();
+    };
+
+    window.handleLogout = async function () {
+      try {
+        await signOut(auth);
+      } catch (error) {
+        console.error('Logout error:', error);
+      }
+    };
+
+    async function seedBiteReports() {
+      try {
+        addLog('Starting to seed bite reports...', 'info');
+        const results = [];
+
+        for (const report of biteReportsSeedData) {
+          const docRef = await addDoc(collection(db, 'biteReports'), report);
+          results.push({
+            id: docRef.id,
+            animalName: report.animalName,
+            status: report.status,
+          });
+          addLog(`  Created bite report: ${report.animalName} (${report.status})`, 'info');
+        }
+
+        addLog(`Successfully seeded ${results.length} bite reports!`, 'success');
+        return results;
+      } catch (error) {
+        addLog(`Error seeding bite reports: ${error.message}`, 'error');
+        throw error;
+      }
+    }
+
+    async function seedRounds() {
+      try {
+        addLog('Starting to seed rounds...', 'info');
+        const results = [];
+
+        for (const round of roundsSeedData) {
+          const docRef = await addDoc(collection(db, 'rounds'), round);
+          results.push({
+            id: docRef.id,
+            date: round.date,
+            assignedTo: round.assignedTo,
+            status: round.status,
+          });
+          addLog(`  Created round: ${round.date} - ${round.assignedTo} (${round.status})`, 'info');
+        }
+
+        addLog(`Successfully seeded ${results.length} rounds!`, 'success');
+        return results;
+      } catch (error) {
+        addLog(`Error seeding rounds: ${error.message}`, 'error');
+        throw error;
+      }
+    }
+
+    async function seedMessages() {
+      try {
+        addLog('Starting to seed messages...', 'info');
+        const results = [];
+
+        for (const message of messagesSeedData) {
+          const docRef = await addDoc(collection(db, 'messages'), message);
+          results.push({
+            id: docRef.id,
+            preview: message.text.substring(0, 50) + '...',
+            recipients: message.recipients.length
+          });
+          addLog(`  Created message: "${message.text.substring(0, 60)}..." to ${message.recipients.length} recipient(s)`, 'info');
+        }
+
+        addLog(`Successfully seeded ${results.length} messages!`, 'success');
+        return results;
+      } catch (error) {
+        addLog(`Error seeding messages: ${error.message}`, 'error');
+        throw error;
+      }
+    }
+
+    async function seedAllCollections() {
+      const btn = document.getElementById('seedBtn');
+      const output = document.getElementById('output');
+      const message = document.getElementById('message');
+
+      try {
+        btn.disabled = true;
+        output.classList.add('active');
+        output.innerHTML = '';
+
+        addLog('Starting admin collection seeding...', 'info');
+        addLog('', 'info');
+
+        const biteReportsResults = await seedBiteReports();
+        addLog('', 'info');
+
+        const roundsResults = await seedRounds();
+        addLog('', 'info');
+
+        const messagesResults = await seedMessages();
+        addLog('', 'info');
+
+        addLog('Admin collection seeding complete!', 'success');
+
+        showMessage(
+          `Successfully seeded ${biteReportsResults.length} bite reports, ${roundsResults.length} rounds, and ${messagesResults.length} messages!`,
+          'success'
+        );
+      } catch (error) {
+        addLog(`Error during seeding: ${error.message}`, 'error');
+        showMessage('Error seeding data. Check console for details.', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function addLog(message, type = 'info') {
+      const output = document.getElementById('output');
+      const line = document.createElement('div');
+      line.className = `output-line ${type}`;
+      line.textContent = message;
+      output.appendChild(line);
+      output.scrollTop = output.scrollHeight;
+      console.log(message);
+    }
+
+    function showMessage(text, type) {
+      const message = document.getElementById('message');
+      message.textContent = text;
+      message.className = `message active ${type}`;
+      setTimeout(() => {
+        message.classList.remove('active');
+      }, 5000);
+    }
+
+    function updateAuthStatus(user) {
+      const statusDiv = document.getElementById('authStatus');
+      const seedBtn = document.getElementById('seedBtn');
+      const logoutBtn = document.getElementById('logoutBtn');
+
+      if (user) {
+        statusDiv.classList.add('authenticated');
+        statusDiv.innerHTML = `
+          <div class="status-label">Authentication Status</div>
+          <div class="status-text">Authenticated</div>
+          <div class="user-email">${user.email}</div>
+        `;
+        seedBtn.disabled = false;
+        logoutBtn.style.display = 'block';
+      } else {
+        statusDiv.classList.remove('authenticated');
+        statusDiv.innerHTML = `
+          <div class="status-label">Authentication Status</div>
+          <div class="status-text">Not Authenticated</div>
+        `;
+        seedBtn.disabled = true;
+        logoutBtn.style.display = 'none';
+      }
+    }
+
+    // Monitor auth state
+    onAuthStateChanged(auth, (user) => {
+      updateAuthStatus(user);
+    });
+  </script>
+</body>
+</html>

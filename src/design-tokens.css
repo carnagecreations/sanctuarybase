@@ -1,0 +1,317 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   MODERN DESIGN SYSTEM - COMPREHENSIVE DESIGN TOKENS
+
+   A premium, professional design system with:
+   - Modern color palette with semantic meanings
+   - Sophisticated typography scale
+   - Consistent spacing system
+   - Layered shadow system for depth
+   - Smooth animations and transitions
+   - WCAG AA+ contrast ratios
+   ════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ─── COLOR PALETTE: PRIMARY & BACKGROUNDS ─────────────────────────────── */
+  /* Dark theme (default) - Premium dark palette with depth */
+  --color-bg-0:      #0F0820;   /* Deepest background - modals, overlays */
+  --color-bg-1:      #1A1033;   /* Main background */
+  --color-bg-2:      #22163F;   /* Secondary background - nav, headers */
+  --color-bg-3:      #2C1D52;   /* Tertiary background - subtle sections */
+
+  /* Surface colors with progressive depth */
+  --color-surface-0: #1A1033;   /* Base surface */
+  --color-surface-1: #2E1F5E;   /* Default cards */
+  --color-surface-2: #3A2870;   /* Hover states */
+  --color-surface-3: #442F82;   /* Interactive states */
+  --color-surface-4: #4E3896;   /* Pressed states */
+
+  /* Border colors with improved contrast */
+  --color-border:    rgba(255,255,255,.08);
+  --color-border-alt: rgba(255,255,255,.12);
+  --color-border-strong: rgba(255,255,255,.18);
+
+  /* ─── COLOR PALETTE: SEMANTIC COLORS ─────────────────────────────────── */
+  /* Brand/Primary: Vibrant Orange with gradients */
+  --color-brand:     #FF7A45;
+  --color-brand-light: #FF9966;
+  --color-brand-dark: #E05A28;
+  --color-brand-faint: rgba(255,122,69,.12);
+  --color-brand-glow: rgba(255,122,69,.35);
+
+  /* Success: Emerald Green */
+  --color-success:   #10B981;
+  --color-success-light: #34D399;
+  --color-success-dark: #059669;
+  --color-success-faint: rgba(16,185,129,.12);
+  --color-success-glow: rgba(16,185,129,.25);
+
+  /* Mint/Teal: Cyan accent for secondary highlights */
+  --color-mint:      #4EFFC5;
+  --color-mint-light: #6FFFDA;
+  --color-mint-dark: #1DC995;
+  --color-mint-faint: rgba(78,255,197,.12);
+  --color-mint-glow: rgba(78,255,197,.3);
+
+  /* Warning: Amber/Gold */
+  --color-warning:   #D97706;
+  --color-warning-light: #F59E0B;
+  --color-warning-dark: #A16207;
+  --color-warning-faint: rgba(217,119,6,.12);
+  --color-warning-glow: rgba(217,119,6,.25);
+
+  /* Error: Red/Coral */
+  --color-error:     #EF4444;
+  --color-error-light: #F87171;
+  --color-error-dark: #DC2626;
+  --color-error-faint: rgba(239,68,68,.12);
+  --color-error-glow: rgba(239,68,68,.25);
+
+  /* Info: Blue */
+  --color-info:      #3B82F6;
+  --color-info-light: #60A5FA;
+  --color-info-dark: #1D4ED8;
+  --color-info-faint: rgba(59,130,246,.12);
+  --color-info-glow: rgba(59,130,246,.25);
+
+  /* Lavender/Purple accent */
+  --color-accent-purple: #C4B5FD;
+  --color-accent-purple-faint: rgba(196,181,253,.12);
+  --color-accent-purple-glow: rgba(196,181,253,.25);
+
+  /* ─── COLOR PALETTE: TEXT COLORS ──────────────────────────────────────── */
+  --color-text-primary:   #FFFFFF;           /* High contrast primary */
+  --color-text-secondary: rgba(255,255,255,.87); /* Secondary text */
+  --color-text-tertiary:  rgba(255,255,255,.64); /* Tertiary/muted text */
+  --color-text-disabled:  rgba(255,255,255,.38); /* Disabled state */
+
+  /* ─── GRADIENTS ─────────────────────────────────────────────────────── */
+  --gradient-brand: linear-gradient(135deg, #FF7A45, #FF9966);
+  --gradient-brand-to-pink: linear-gradient(135deg, #FF7A45, #FF4F9A);
+  --gradient-success: linear-gradient(135deg, #10B981, #34D399);
+  --gradient-mint: linear-gradient(135deg, #4EFFC5, #1DC995);
+  --gradient-warning: linear-gradient(135deg, #D97706, #F59E0B);
+  --gradient-info: linear-gradient(135deg, #3B82F6, #60A5FA);
+
+  /* Subtle background gradients */
+  --gradient-bg-subtle: linear-gradient(135deg, rgba(255,122,69,.05), rgba(78,255,197,.05));
+  --gradient-bg-accent: linear-gradient(135deg, rgba(255,122,69,.08), rgba(255,79,154,.08));
+
+  /* ─── TYPOGRAPHY SCALE ───────────────────────────────────────────────── */
+  /* Font families */
+  --font-family-primary: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-display: 'Fredoka One', 'Nunito', sans-serif;
+
+  /* Font sizes - comprehensive scale */
+  --font-size-xs:    11px;
+  --font-size-sm:    12px;
+  --font-size-base:  13px;
+  --font-size-lg:    14px;
+  --font-size-xl:    15px;
+  --font-size-2xl:   17px;
+  --font-size-3xl:   20px;
+  --font-size-4xl:   24px;
+  --font-size-5xl:   28px;
+  --font-size-6xl:   32px;
+
+  /* Font weights */
+  --font-weight-light:      300;
+  --font-weight-normal:     400;
+  --font-weight-medium:     500;
+  --font-weight-semibold:   600;
+  --font-weight-bold:       700;
+  --font-weight-extrabold:  800;
+  --font-weight-black:      900;
+
+  /* Line heights for readability */
+  --line-height-tight:   1.25;
+  --line-height-normal:  1.5;
+  --line-height-relaxed: 1.65;
+  --line-height-loose:   1.8;
+
+  /* Letter spacing */
+  --letter-spacing-tight:  -0.01em;
+  --letter-spacing-normal: 0em;
+  --letter-spacing-loose:  0.04em;
+  --letter-spacing-extra:  0.08em;
+
+  /* ─── SPACING SCALE ────────────────────────────────────────────────── */
+  --space-0:    0px;
+  --space-1:    2px;
+  --space-2:    4px;
+  --space-3:    8px;
+  --space-4:    12px;
+  --space-5:    16px;
+  --space-6:    20px;
+  --space-7:    24px;
+  --space-8:    28px;
+  --space-9:    32px;
+  --space-10:   40px;
+  --space-11:   48px;
+  --space-12:   56px;
+  --space-13:   64px;
+  --space-14:   80px;
+  --space-15:   96px;
+
+  /* Common spacing combinations */
+  --padding-xs:  var(--space-2);
+  --padding-sm:  var(--space-3);
+  --padding-md:  var(--space-5);
+  --padding-lg:  var(--space-7);
+  --padding-xl:  var(--space-9);
+  --padding-2xl: var(--space-11);
+
+  --gap-xs:  var(--space-2);
+  --gap-sm:  var(--space-3);
+  --gap-md:  var(--space-5);
+  --gap-lg:  var(--space-7);
+  --gap-xl:  var(--space-9);
+
+  /* ─── BORDER RADIUS ────────────────────────────────────────────────── */
+  --radius-none:  0px;
+  --radius-sm:    6px;
+  --radius-md:    10px;
+  --radius-lg:    14px;
+  --radius-xl:    18px;
+  --radius-2xl:   24px;
+  --radius-full:  9999px;
+
+  /* Common radius assignments */
+  --r:    var(--radius-md);
+  --rl:   var(--radius-lg);
+  --rxl:  var(--radius-xl);
+
+  /* ─── SHADOW SYSTEM ────────────────────────────────────────────────── */
+  /* Subtle shadows for layering */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,.12);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.24);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.32);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.07);
+  --shadow-xl: 0 12px 48px rgba(0,0,0,.48), 0 0 0 1px rgba(255,255,255,.1);
+  --shadow-2xl: 0 16px 64px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.12);
+
+  /* Glow effects for interactive elements */
+  --shadow-glow-brand: 0 0 16px rgba(255,122,69,.35), 0 0 32px rgba(255,122,69,.15);
+  --shadow-glow-mint: 0 0 16px rgba(78,255,197,.3), 0 0 32px rgba(78,255,197,.12);
+  --shadow-glow-success: 0 0 16px rgba(16,185,129,.25);
+  --shadow-glow-warning: 0 0 16px rgba(217,119,6,.25);
+  --shadow-glow-error: 0 0 16px rgba(239,68,68,.25);
+
+  /* Focus state shadow */
+  --shadow-focus: 0 0 0 3px rgba(78,255,197,.2);
+
+  /* ─── TRANSITIONS & ANIMATIONS ──────────────────────────────────────── */
+  --duration-fast:    150ms;
+  --duration-normal:  300ms;
+  --duration-slow:    500ms;
+
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out:    cubic-bezier(0, 0, 0.2, 1);
+  --ease-in:     cubic-bezier(0.4, 0, 1, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* ─── Z-INDEX SCALE ────────────────────────────────────────────────── */
+  --z-hide:       -1;
+  --z-base:       0;
+  --z-dropdown:   10;
+  --z-sticky:     20;
+  --z-nav:        50;
+  --z-overlay:    40;
+  --z-modal:      50;
+  --z-popover:    60;
+  --z-tooltip:    70;
+  --z-notification: 100;
+}
+
+/* ═════════════════════════════════════════════════════════════════════════════
+   LIGHT MODE OVERRIDES
+   ═════════════════════════════════════════════════════════════════════════════ */
+[data-theme="light"] {
+  /* Backgrounds */
+  --color-bg-0:      #FFFFFF;
+  --color-bg-1:      #F4F1FF;
+  --color-bg-2:      #EDE8FF;
+  --color-bg-3:      #E4DCFF;
+
+  /* Surfaces */
+  --color-surface-0: #F4F1FF;
+  --color-surface-1: #FFFFFF;
+  --color-surface-2: #F0EBFF;
+  --color-surface-3: #E4DCFF;
+  --color-surface-4: #DDD4F0;
+
+  /* Borders */
+  --color-border:    rgba(0,0,0,.06);
+  --color-border-alt: rgba(0,0,0,.09);
+  --color-border-strong: rgba(0,0,0,.15);
+
+  /* Semantic colors - adjust for light background */
+  --color-brand:     #E05A28;
+  --color-brand-light: #FF7A45;
+  --color-brand-dark: #C0471F;
+  --color-brand-faint: rgba(224,90,40,.08);
+  --color-brand-glow: rgba(224,90,40,.15);
+
+  --color-success:   #059669;
+  --color-success-light: #10B981;
+  --color-success-dark: #047857;
+  --color-success-faint: rgba(5,150,105,.08);
+  --color-success-glow: rgba(5,150,105,.15);
+
+  --color-mint:      #0FA87D;
+  --color-mint-light: #10B981;
+  --color-mint-dark: #0A8A65;
+  --color-mint-faint: rgba(15,168,125,.08);
+  --color-mint-glow: rgba(15,168,125,.15);
+
+  --color-warning:   #A16207;
+  --color-warning-light: #D97706;
+  --color-warning-dark: #7C2D12;
+  --color-warning-faint: rgba(161,98,7,.08);
+  --color-warning-glow: rgba(161,98,7,.15);
+
+  --color-error:     #DC2626;
+  --color-error-light: #EF4444;
+  --color-error-dark: #991B1B;
+  --color-error-faint: rgba(220,38,38,.08);
+  --color-error-glow: rgba(220,38,38,.15);
+
+  --color-info:      #1D4ED8;
+  --color-info-light: #3B82F6;
+  --color-info-dark: #1E40AF;
+  --color-info-faint: rgba(29,78,216,.08);
+  --color-info-glow: rgba(29,78,216,.15);
+
+  --color-accent-purple: #8B5CF6;
+  --color-accent-purple-faint: rgba(139,92,246,.08);
+  --color-accent-purple-glow: rgba(139,92,246,.15);
+
+  /* Text colors */
+  --color-text-primary:   #1A1033;
+  --color-text-secondary: rgba(26,16,51,.87);
+  --color-text-tertiary:  rgba(26,16,51,.64);
+  --color-text-disabled:  rgba(26,16,51,.38);
+
+  /* Gradients for light mode */
+  --gradient-brand: linear-gradient(135deg, #E05A28, #FF7A45);
+  --gradient-brand-to-pink: linear-gradient(135deg, #E05A28, #E05A9C);
+  --gradient-success: linear-gradient(135deg, #059669, #10B981);
+  --gradient-mint: linear-gradient(135deg, #0FA87D, #0A8A65);
+  --gradient-warning: linear-gradient(135deg, #A16207, #D97706);
+  --gradient-info: linear-gradient(135deg, #1D4ED8, #3B82F6);
+
+  /* Shadows for light mode */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,.08);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.12);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.16);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,.18), 0 0 0 1px rgba(0,0,0,.05);
+  --shadow-xl: 0 12px 48px rgba(0,0,0,.22), 0 0 0 1px rgba(0,0,0,.08);
+  --shadow-2xl: 0 16px 64px rgba(0,0,0,.28), 0 0 0 1px rgba(0,0,0,.1);
+
+  --shadow-glow-brand: 0 0 16px rgba(224,90,40,.2), 0 0 32px rgba(224,90,40,.1);
+  --shadow-glow-mint: 0 0 16px rgba(15,168,125,.18);
+  --shadow-glow-success: 0 0 16px rgba(5,150,105,.15);
+  --shadow-glow-warning: 0 0 16px rgba(161,98,7,.15);
+  --shadow-glow-error: 0 0 16px rgba(220,38,38,.15);
+
+  --shadow-focus: 0 0 0 3px rgba(15,168,125,.15);
+}
