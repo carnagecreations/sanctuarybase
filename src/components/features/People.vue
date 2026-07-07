@@ -25,7 +25,7 @@
         :options="[{value:'volunteer',label:'Volunteer'},{value:'staff',label:'Staff'},{value:'admin',label:'Admin'}]"
       />
       <div class="form-actions">
-        <AppButton variant="primary" :disabled="creatingAccount" @click="createAccount">
+        <AppButton variant="primary" :disabled="creatingAccount" @click="() => { alert('Button clicked!'); createAccount(); }">
           {{ creatingAccount ? 'Creating...' : 'Create account' }}
         </AppButton>
         <AppButton @click="showCreate = false">Cancel</AppButton>
