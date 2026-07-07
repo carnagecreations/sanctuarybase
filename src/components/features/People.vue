@@ -25,9 +25,6 @@
         :options="[{value:'volunteer',label:'Volunteer'},{value:'staff',label:'Staff'},{value:'admin',label:'Admin'}]"
       />
       <div class="form-actions">
-        <button @click="createAccount" :disabled="creatingAccount" style="padding: 10px 20px; background: green; color: white; border: none; cursor: pointer;">
-          {{ creatingAccount ? 'Creating...' : 'TEST: Create account' }}
-        </button>
         <AppButton variant="primary" :disabled="creatingAccount" @click="createAccount">
           {{ creatingAccount ? 'Creating...' : 'Create account' }}
         </AppButton>
@@ -190,9 +187,7 @@ const goToShifts = (v) => {
 }
 
 const createAccount = async () => {
-  console.log('[createAccount] Function called')
   const { firstName, lastName, email, password, role } = newUser.value
-  console.log('[createAccount] Form data:', { firstName, lastName, email, password, role })
 
   if (!firstName.trim()) { ui.showToast('First name is required', 'error'); return }
   if (!lastName.trim()) { ui.showToast('Last name is required', 'error'); return }
@@ -200,14 +195,9 @@ const createAccount = async () => {
   if (!password.trim()) { ui.showToast('Temporary password is required', 'error'); return }
   if (password.length < 8) { ui.showToast('Password must be at least 8 characters', 'error'); return }
 
-  console.log('[createAccount] Validation passed')
   creatingAccount.value = true
   try {
-    console.log('[createAccount] Getting ID token...')
     const idToken = await auth.getIdToken()
-    console.log('[createAccount] Got ID token:', idToken.slice(0, 20) + '...')
-
-    console.log('[createAccount] Calling API...')
     const result = await fetch('/api/create-staff-account', {
       method: 'POST',
       headers: {
@@ -223,20 +213,17 @@ const createAccount = async () => {
       }),
     })
 
-    console.log('[createAccount] API response status:', result.status)
     if (!result.ok) {
       const error = await result.json()
       throw new Error(error.error || error.message || 'Failed to create account')
     }
 
-    const data = await result.json()
-    console.log('[createAccount] Account created:', data)
     ui.showToast(`${firstName} ${lastName} account created`)
     newUser.value = { firstName: '', lastName: '', email: '', password: '', role: 'volunteer' }
     showCreate.value = false
     await peopleStore.fetchPeople()
   } catch (err) {
-    console.error('[createAccount] Error:', err)
+    console.error('Create account error:', err)
     ui.showToast(err.message || 'Error creating account', 'error')
   } finally {
     creatingAccount.value = false

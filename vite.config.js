@@ -35,6 +35,11 @@ export default defineConfig({
         // bootable without a network connection.
         globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
         navigateFallback: '/index.html',
+        // Without these, a newly installed SW sits in "waiting" forever
+        // while the old one keeps every open tab pinned to its stale
+        // precache — a hard refresh alone never picks up a new deploy.
+        skipWaiting: true,
+        clientsClaim: true,
         runtimeCaching: [
           {
             // Weather/API calls some pages hit directly — best-effort cache,
