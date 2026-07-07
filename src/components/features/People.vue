@@ -25,10 +25,10 @@
         :options="[{value:'volunteer',label:'Volunteer'},{value:'staff',label:'Staff'},{value:'admin',label:'Admin'}]"
       />
       <div class="form-actions">
-        <AppButton variant="primary" :disabled="creatingAccount" @click="createAccount">
+        <AppButton variant="primary" :disabled="creatingAccount" v-on:click="createAccount">
           {{ creatingAccount ? 'Creating...' : 'Create account' }}
         </AppButton>
-        <AppButton @click="showCreate = false">Cancel</AppButton>
+        <AppButton v-on:click="showCreate = false">Cancel</AppButton>
       </div>
     </AppCard>
 
