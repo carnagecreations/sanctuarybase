@@ -25,7 +25,9 @@
         :options="[{value:'volunteer',label:'Volunteer'},{value:'staff',label:'Staff'},{value:'admin',label:'Admin'}]"
       />
       <div class="form-actions">
-        <AppButton variant="primary">Create account</AppButton>
+        <AppButton variant="primary" :disabled="creatingAccount" @click="createAccount">
+          {{ creatingAccount ? 'Creating...' : 'Create account' }}
+        </AppButton>
         <AppButton @click="showCreate = false">Cancel</AppButton>
       </div>
     </AppCard>
@@ -95,6 +97,7 @@ const auth        = useAuthStore()
 const userRoles   = useUserRolesStore()
 const search      = ref('')
 const showCreate  = ref(false)
+const creatingAccount = ref(false)
 const newUser     = ref({ firstName: '', lastName: '', email: '', password: '', role: 'volunteer' })
 
 const editingId  = ref(null)
@@ -181,6 +184,60 @@ const saveEdit = async (id) => {
 const goToShifts = (v) => {
   ui.shiftPrefillVolunteer = v.name
   ui.setCurrentTab('admin-shift-calendar')
+}
+
+const createAccount = async () => {
+  console.log('[createAccount] Function called')
+  const { firstName, lastName, email, password, role } = newUser.value
+  console.log('[createAccount] Form data:', { firstName, lastName, email, password, role })
+
+  if (!firstName.trim()) { ui.showToast('First name is required', 'error'); return }
+  if (!lastName.trim()) { ui.showToast('Last name is required', 'error'); return }
+  if (!email.trim()) { ui.showToast('Email is required', 'error'); return }
+  if (!password.trim()) { ui.showToast('Temporary password is required', 'error'); return }
+  if (password.length < 8) { ui.showToast('Password must be at least 8 characters', 'error'); return }
+
+  console.log('[createAccount] Validation passed')
+  creatingAccount.value = true
+  try {
+    console.log('[createAccount] Getting ID token...')
+    const idToken = await auth.getIdToken()
+    console.log('[createAccount] Got ID token:', idToken.slice(0, 20) + '...')
+
+    console.log('[createAccount] Calling API...')
+    const result = await fetch('/api/create-staff-account', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${idToken}`,
+      },
+      body: JSON.stringify({
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: email.trim(),
+        password: password.trim(),
+        role: role.toLowerCase(),
+      }),
+    })
+
+    console.log('[createAccount] API response status:', result.status)
+    if (!result.ok) {
+      const error = await result.json()
+      throw new Error(error.error || error.message || 'Failed to create account')
+    }
+
+    const data = await result.json()
+    console.log('[createAccount] Account created:', data)
+    ui.showToast(`${firstName} ${lastName} account created`)
+    newUser.value = { firstName: '', lastName: '', email: '', password: '', role: 'volunteer' }
+    showCreate.value = false
+    await peopleStore.fetchPeople()
+  } catch (err) {
+    console.error('[createAccount] Error:', err)
+    ui.showToast(err.message || 'Error creating account', 'error')
+  } finally {
+    creatingAccount.value = false
+  }
 }
 
 onMounted(() => peopleStore.fetchPeople())

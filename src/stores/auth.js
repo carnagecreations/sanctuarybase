@@ -158,6 +158,13 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  /** Gets the current user's Firebase ID token for API requests. @returns {Promise<string>} */
+  const getIdToken = async () => {
+    const fbUser = auth.currentUser
+    if (!fbUser) throw new Error('Not signed in')
+    return await fbUser.getIdToken()
+  }
+
   return {
     user,
     isLoggedIn,
@@ -173,5 +180,6 @@ export const useAuthStore = defineStore('auth', () => {
     signOut,
     clockIn,
     clockOut,
+    getIdToken,
   }
 })
