@@ -256,11 +256,18 @@ const daysInCare = (animal) => {
 
 const animals = computed(() => {
   const storeAnimals = animalsStore.animals || []
-  return Array.isArray(storeAnimals) ? storeAnimals.map(a => ({
+  const mapped = Array.isArray(storeAnimals) ? storeAnimals.map(a => ({
     ...a,
     emoji: getSpeciesEmoji(a.species),
     speciesKey: getSpeciesKey(a.species),
   })) : []
+  // Log animals with photos for debugging
+  mapped.forEach(a => {
+    if (a.photos?.length) {
+      console.log(`Animal ${a.name} has ${a.photos.length} photos:`, a.photos)
+    }
+  })
+  return mapped
 })
 
 const speciesStats = computed(() => {

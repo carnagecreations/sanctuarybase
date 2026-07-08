@@ -219,10 +219,18 @@ const onFilesSelected = async (e) => {
   photoMsg.value = 'Uploading…'
   try {
     const urls = await animalsAdmin.uploadImages(files)
+    console.log('Upload response:', urls)
+    if (!urls || urls.length === 0) {
+      photoMsg.value = 'Upload returned no URLs'
+      return
+    }
     photos.value.push(...urls)
+    console.log('Photos array before update:', photos.value)
     await animalsStore.updateAnimal(props.animal.id, { photos: photos.value })
+    console.log('Update complete')
     photoMsg.value = `${urls.length} photo(s) added.`
   } catch (err) {
+    console.error('Upload error:', err)
     photoMsg.value = err.message || 'Upload failed.'
   } finally {
     e.target.value = ''
