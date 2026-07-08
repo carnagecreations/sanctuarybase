@@ -88,7 +88,10 @@
         @click="ui.selectAnimal(a)"
       >
         <div class="animal-row">
-          <div class="animal-emoji">{{ a.emoji }}</div>
+          <div class="animal-photo">
+            <img v-if="a.photos?.length" :src="siteMediaUrl(a.photos[0])" :alt="a.name" />
+            <span v-else class="animal-emoji">{{ a.emoji }}</span>
+          </div>
           <div class="animal-info">
             <div class="animal-name-row">
               <span class="animal-name">{{ a.name }}</span>
@@ -119,6 +122,7 @@ import { ref, computed, onMounted } from 'vue'
 import { PageContainer, AppCard, AppBadge, AppButton, AppInput, AppSelect, AlertBox, EmptyState, AppModal } from '../ui'
 import { useUIStore } from '../../stores/ui'
 import { useAnimalsStore } from '../../stores/animals'
+import { siteMediaUrl } from '../../services/siteApi'
 
 const ui = useUIStore()
 const animalsStore = useAnimalsStore()
@@ -396,7 +400,9 @@ onMounted(() => animalsStore.fetchAnimals())
   gap: 14px;
 }
 
-.animal-emoji { font-size: 36px; flex-shrink: 0; padding-top: 4px; }
+.animal-photo { width: 56px; height: 56px; border-radius: 8px; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--surface-2); border: 1px solid var(--border); }
+.animal-photo img { width: 100%; height: 100%; object-fit: cover; }
+.animal-emoji { font-size: 36px; }
 
 .animal-info { flex: 1; min-width: 0; }
 

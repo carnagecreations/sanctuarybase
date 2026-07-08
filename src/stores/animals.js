@@ -68,7 +68,7 @@ export const useAnimalsStore = defineStore('animals', () => {
       })
       const idx = animals.value.findIndex((a) => a.id === id)
       if (idx !== -1) {
-        animals.value[idx] = { ...animals.value[idx], ...animalData }
+        Object.assign(animals.value[idx], animalData)
       }
       return animals.value[idx]
     } catch (error) {
