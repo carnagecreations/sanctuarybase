@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { signInWithPopup, signOut as firebaseSignOut, onAuthStateChanged, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
-import { doc, getDoc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore'
+import { doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs } from 'firebase/firestore'
 import { auth, db } from '../services/firebase'
 import { useShiftsStore } from './shifts'
 
@@ -33,6 +33,29 @@ async function resolveUserRole(uid, email, displayName) {
   return role
 }
 
+// Auto-create a person record if the user doesn't exist in the people collection
+async function ensurePersonRecord(uid, email, displayName, role) {
+  try {
+    const q = query(collection(db, 'people'), where('email', '==', email))
+    const snapshot = await getDocs(q)
+    if (snapshot.empty) {
+      // User not in people collection, add them
+      await setDoc(doc(collection(db, 'people')), {
+        name: displayName || 'User',
+        email: email,
+        types: [role === 'admin' || role === 'staff' ? 'volunteer' : 'volunteer'],
+        role: role,
+        status: 'active',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      })
+    }
+  } catch (err) {
+    console.error('Failed to ensure person record:', err)
+    // Don't throw - auth should succeed even if people record creation fails
+  }
+}
+
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
   const isLoggedIn = computed(() => !!user.value)
@@ -43,10 +66,15 @@ export const useAuthStore = defineStore('auth', () => {
 
   const buildUser = async (fbUser, fallbackName) => {
     const role = await resolveUserRole(fbUser.uid, fbUser.email, fbUser.displayName || fallbackName)
+    const displayName = fbUser.displayName || fallbackName || 'User'
+
+    // Ensure user has a record in the people collection
+    await ensurePersonRecord(fbUser.uid, fbUser.email, displayName, role)
+
     return {
       id: fbUser.uid,
       email: fbUser.email,
-      name: fbUser.displayName || fallbackName || 'User',
+      name: displayName,
       photo: fbUser.photoURL || null,
       role,
     }
