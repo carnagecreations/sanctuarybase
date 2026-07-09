@@ -1,6 +1,6 @@
 <template>
   <PageContainer>
-    <button v-if="auth.user?.role !== 'volunteer'" class="back-btn" @click="ui.setCurrentTab('admin-hub')">← Admin Hub</button>
+    <button v-if="canCreateAnnouncement" class="back-btn" @click="ui.setCurrentTab('admin-hub')">← Admin Hub</button>
 
     <div class="page-header">
       <h1>📢 Announcements</h1>
