@@ -108,6 +108,8 @@
         <AppButton variant="secondary" @click="ui.setCurrentTab('admin-hub')">🗂 Admin Hub</AppButton>
       </div>
 
+      <AppButton variant="danger" @click="auth.signOut()" style="margin-top:16px;width:100%">Sign out</AppButton>
+
     </template>
 
     <!-- ── VOLUNTEER VIEW ── -->
