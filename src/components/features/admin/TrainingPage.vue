@@ -226,21 +226,6 @@
         </div>
       </AppCard>
 
-      <!-- Recent Updates Section -->
-      <SectionLabel>Recent Updates & Announcements</SectionLabel>
-      <div v-if="recentAnnouncements.length" class="announcements-list">
-        <AppCard v-for="announcement in recentAnnouncements" :key="announcement.id" variant="outlined" class="announcement-card">
-          <div class="announcement-header">
-            <h4 class="announcement-title">{{ announcement.title }}</h4>
-            <span class="announcement-date">{{ formatDate(announcement.createdAt) }}</span>
-          </div>
-          <p class="announcement-body">{{ announcement.message }}</p>
-        </AppCard>
-      </div>
-      <div v-else class="no-announcements">
-        <p>No recent announcements yet. Check back soon for updates!</p>
-      </div>
-
       <!-- Support Section -->
       <SectionLabel>Support & Resources</SectionLabel>
       <div class="support-grid">
@@ -322,7 +307,6 @@
 
 <script setup>
 import { ref, reactive, onMounted, onBeforeUnmount, computed } from 'vue'
-import { useAnnouncementsStore } from '../../../stores/announcements'
 import { useTrainingStore } from '../../../stores/training'
 import { useTrainingCompletionsStore } from '../../../stores/trainingCompletions'
 import { useSettingsStore } from '../../../stores/settings'
@@ -330,7 +314,6 @@ import { useVolunteerQuestionsStore } from '../../../stores/volunteerQuestions'
 import { useAuthStore } from '../../../stores/auth'
 import { PageContainer, AppCard, AppModal, SectionLabel, AppButton } from '../../ui'
 
-const announcementsStore = useAnnouncementsStore()
 const trainingStore = useTrainingStore()
 const completionsStore = useTrainingCompletionsStore()
 const settingsStore = useSettingsStore()
@@ -623,7 +606,6 @@ const deleteQuestion = async (q) => {
 
 onMounted(async () => {
   await Promise.all([
-    announcementsStore.fetchAnnouncements(),
     trainingStore.fetchTrainingModules(),
     settingsStore.fetchContact(),
   ])
@@ -633,11 +615,6 @@ onBeforeUnmount(() => {
   trainingStore.cleanup()
   completionsStore.cleanup()
   questionsStore.cleanup()
-})
-
-// Get the last 3 announcements
-const recentAnnouncements = computed(() => {
-  return announcementsStore.announcements.slice(0, 3)
 })
 
 // Format date for display

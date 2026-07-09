@@ -78,24 +78,6 @@
         </div>
       </div>
 
-      <!-- Recent Announcements -->
-      <SectionLabel>Recent Announcements</SectionLabel>
-      <div v-if="recentAnnouncements.length" class="announce-list">
-        <div v-for="a in recentAnnouncements" :key="a.id" class="announce-item" @click="ui.setCurrentTab('admin-announcements')">
-          <div class="announce-icon">📢</div>
-          <div class="announce-body">
-            <div class="announce-title">{{ a.title }}</div>
-            <div v-if="a.message" class="announce-preview">
-              {{ a.message.length > 80 ? a.message.slice(0, 80) + '...' : a.message }}
-            </div>
-          </div>
-          <div class="announce-date">{{ formatDate(a.createdAt) }}</div>
-        </div>
-      </div>
-      <AppCard v-else :flat="true">
-        <EmptyState icon="📢" title="No announcements yet" message="Post one from the Admin Hub." />
-      </AppCard>
-
       <!-- Pending Tasks -->
       <SectionLabel>Pending Tasks</SectionLabel>
       <AppCard v-if="pendingTasks.length" :flat="true">
@@ -183,7 +165,6 @@ import { usePeopleStore } from '../../stores/people'
 import { useTasksStore } from '../../stores/tasks'
 import { useFeedingLogsStore } from '../../stores/feedingLogs'
 import { useComplianceStore } from '../../stores/compliance'
-import { useAnnouncementsStore } from '../../stores/announcements'
 import { useContacts } from '../../stores/contacts'
 import { personTypeList } from './admin/people/personDisplay'
 import { AppCard, SectionLabel, AppButton, EmptyState, PageContainer } from '../ui'
@@ -196,7 +177,6 @@ const peopleStore     = usePeopleStore()
 const tasksStore      = useTasksStore()
 const feedingStore    = useFeedingLogsStore()
 const complianceStore = useComplianceStore()
-const announceStore   = useAnnouncementsStore()
 const { unreadCount, loadContacts } = useContacts()
 
 const now       = new Date()
@@ -252,10 +232,6 @@ const overdueItems = computed(() => {
 
 const overdueCount = computed(() => overdueItems.value.length)
 
-const recentAnnouncements = computed(() => {
-  return (announceStore.announcements || []).slice(0, 3)
-})
-
 const formatDate = (dateStr) => {
   if (!dateStr) return ''
   const d = dateStr?.toDate ? dateStr.toDate() : new Date(dateStr)
@@ -269,7 +245,6 @@ onMounted(() => {
   tasksStore.fetchTasks()
   feedingStore.fetchFeedingLogs()
   complianceStore.fetchCompliance()
-  announceStore.setupRealtimeListener()
   if (isAdmin.value) loadContacts()
 })
 </script>

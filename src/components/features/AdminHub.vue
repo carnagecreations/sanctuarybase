@@ -68,7 +68,6 @@ const allSections = [
     gridClass: 'hub-grid-6',
     itemClass: 'hub-item-lg',
     items: [
-      { id: 'announcements',  icon: '📢', label: 'Announcements' },
       { id: 'messaging',      icon: '💌', label: 'Message Team' },
       { id: 'tasks',          icon: '✅', label: 'Tasks' },
       { id: 'supplies',       icon: '📦', label: 'Supplies' },
@@ -98,9 +97,7 @@ const allSections = [
       { id: 'availability', icon: '📅', label: 'Availability' },
       { id: 'waivers',      icon: '📋', label: 'Waivers' },
       { id: 'inbox',        icon: '📥', label: 'Applications & Inbox' },
-      { id: 'training',     icon: '🎓', label: 'Training' },
       { id: 'newsletter',   icon: '📰', label: 'Newsletter', adminOnly: true },
-      { id: 'stories',      icon: '📝', label: 'Stories', adminOnly: true },
     ]
   },
   {
@@ -166,7 +163,6 @@ const visibleSections = computed(() =>
 )
 
 const featureRoutes = {
-  'announcements':      'admin-announcements',
   'messaging':          'admin-message-team',
   'tasks':              'admin-tasks',
   'supplies':           'admin-supplies',
@@ -189,7 +185,6 @@ const featureRoutes = {
   'quarantine':         'admin-quarantine',
   'auction-items':      'admin-auction-items',
   'reports-hub':        'admin-reports-hub',
-  'stories':            'admin-stories',
   'volunteer-hours':    'admin-volunteer-hours',
   'activity-log':       'admin-activity',
   'bites':              'admin-bites',
