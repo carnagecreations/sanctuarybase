@@ -8,14 +8,11 @@ import { auth } from './firebase'
 export const SITE_API_BASE = '/api/site'
 export const SITE_ORIGIN = 'https://sfr-rescue.pages.dev'
 
-// Media URLs stored on the site are site-relative ("/media/animals/…").
-// Serve as-is since they're relative paths on the current domain.
+// Media URLs stored on the site are site-relative ("/media/animals/…"), which
+// are served from sfr-rescue.pages.dev regardless of which domain the app runs on.
 export function siteMediaUrl(u) {
   if (!u) return ''
-  // Absolute URL - use as-is
-  if (/^https?:\/\//i.test(u)) return u
-  // Relative URL - serve from current domain
-  return u
+  return /^https?:\/\//i.test(u) ? u : SITE_ORIGIN + u
 }
 
 export async function authHeaders() {
