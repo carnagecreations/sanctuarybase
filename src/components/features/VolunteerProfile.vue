@@ -61,20 +61,47 @@
     <template v-if="isVolunteer">
       <SectionLabel>My availability</SectionLabel>
       <AppCard>
-        <div v-if="profile?.availability?.length" class="days-grid">
-          <span v-for="d in allDays" :key="d" class="day-chip" :class="{ active: profile.availability.includes(d) }">
+        <div v-if="!editingAvailability" class="days-grid">
+          <span v-for="d in allDays" :key="d" class="day-chip" :class="{ active: profile?.availability?.includes(d) }">
             {{ d }}
           </span>
         </div>
-        <div v-else class="empty-note">No availability set</div>
+        <div v-else class="days-grid editable">
+          <button v-for="d in allDays" :key="d" class="day-chip" :class="{ active: draft.availability.includes(d) }" @click="toggleDay(d)">
+            {{ d }}
+          </button>
+        </div>
+        <div v-if="!profile?.availability?.length && !editingAvailability" class="empty-note">No availability set</div>
+        <AppButton v-if="!editingAvailability" size="sm" @click="startEditAvailability" style="margin-top:8px">✏️ Edit availability</AppButton>
+        <div v-else style="display:flex; gap:8px; margin-top:8px">
+          <AppButton size="sm" variant="primary" @click="saveAvailability" :disabled="savingAvail">{{ savingAvail ? 'Saving...' : 'Save' }}</AppButton>
+          <AppButton size="sm" @click="editingAvailability = false">Cancel</AppButton>
+        </div>
       </AppCard>
 
       <SectionLabel>My skills</SectionLabel>
       <AppCard>
-        <div v-if="profile?.skills?.length" class="skills-grid">
-          <span v-for="s in profile.skills" :key="s" class="skill-chip">{{ s }}</span>
+        <div v-if="!editingSkills" class="skills-grid">
+          <span v-for="s in profile?.skills" :key="s" class="skill-chip">{{ s }}</span>
+          <div v-if="!profile?.skills?.length" class="empty-note">No skills listed</div>
         </div>
-        <div v-else class="empty-note">No skills listed</div>
+        <div v-else class="skills-edit">
+          <div class="skill-input-group">
+            <input v-model="newSkill" placeholder="Add a skill..." @keyup.enter="addSkill" />
+            <AppButton size="sm" variant="primary" @click="addSkill" :disabled="!newSkill.trim()">Add</AppButton>
+          </div>
+          <div class="skills-grid">
+            <div v-for="s in draft.skills" :key="s" class="skill-chip removable">
+              {{ s }}
+              <button class="remove-skill" @click="removeSkill(s)">✕</button>
+            </div>
+          </div>
+        </div>
+        <AppButton v-if="!editingSkills" size="sm" @click="startEditSkills" style="margin-top:8px">✏️ Edit skills</AppButton>
+        <div v-else style="display:flex; gap:8px; margin-top:8px">
+          <AppButton size="sm" variant="primary" @click="saveSkills" :disabled="savingSkills">{{ savingSkills ? 'Saving...' : 'Save' }}</AppButton>
+          <AppButton size="sm" @click="editingSkills = false">Cancel</AppButton>
+        </div>
       </AppCard>
     </template>
 
@@ -109,6 +136,11 @@ const auth = useAuthStore()
 const peopleStore = usePeopleStore()
 const editing = ref(false)
 const saving = ref(false)
+const editingAvailability = ref(false)
+const editingSkills = ref(false)
+const savingAvail = ref(false)
+const savingSkills = ref(false)
+const newSkill = ref('')
 
 const allDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
@@ -136,13 +168,15 @@ const joinedDate = computed(() => {
   return d ? new Date(d).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '—'
 })
 
-const draft = ref({ name: '', phone: '', why: '' })
+const draft = ref({ name: '', phone: '', why: '', availability: [], skills: [] })
 
 const startEdit = () => {
   draft.value = {
     name: profile.value?.name || auth.user?.name || '',
     phone: profile.value?.phone || auth.user?.phone || '',
     why: profile.value?.why || '',
+    availability: [...(profile.value?.availability || [])],
+    skills: [...(profile.value?.skills || [])],
   }
   editing.value = true
 }
@@ -159,6 +193,65 @@ const save = async () => {
   } finally {
     saving.value = false
     editing.value = false
+  }
+}
+
+const startEditAvailability = () => {
+  draft.value.availability = [...(profile.value?.availability || [])]
+  editingAvailability.value = true
+}
+
+const toggleDay = (day) => {
+  const idx = draft.value.availability.indexOf(day)
+  if (idx > -1) {
+    draft.value.availability.splice(idx, 1)
+  } else {
+    draft.value.availability.push(day)
+  }
+}
+
+const saveAvailability = async () => {
+  savingAvail.value = true
+  try {
+    if (profile.value?.id) {
+      await peopleStore.updatePerson(profile.value.id, { availability: draft.value.availability })
+    }
+  } finally {
+    savingAvail.value = false
+    editingAvailability.value = false
+  }
+}
+
+const startEditSkills = () => {
+  draft.value.skills = [...(profile.value?.skills || [])]
+  newSkill.value = ''
+  editingSkills.value = true
+}
+
+const addSkill = () => {
+  const skill = newSkill.value.trim()
+  if (skill && !draft.value.skills.includes(skill)) {
+    draft.value.skills.push(skill)
+    newSkill.value = ''
+  }
+}
+
+const removeSkill = (skill) => {
+  const idx = draft.value.skills.indexOf(skill)
+  if (idx > -1) {
+    draft.value.skills.splice(idx, 1)
+  }
+}
+
+const saveSkills = async () => {
+  savingSkills.value = true
+  try {
+    if (profile.value?.id) {
+      await peopleStore.updatePerson(profile.value.id, { skills: draft.value.skills })
+    }
+  } finally {
+    savingSkills.value = false
+    editingSkills.value = false
   }
 }
 
@@ -280,6 +373,15 @@ onMounted(() => peopleStore.fetchPeople())
   gap: 6px;
 }
 
+.days-grid.editable .day-chip {
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.days-grid.editable .day-chip:hover {
+  transform: translateY(-2px);
+}
+
 .day-chip {
   padding: 5px 12px;
   border-radius: 20px;
@@ -310,6 +412,55 @@ onMounted(() => peopleStore.fetchPeople())
   background: var(--surface-2);
   border: 1.5px solid var(--border);
   color: var(--ink-2);
+}
+
+.skill-chip.removable {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+}
+
+.remove-skill {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--ink-3);
+  padding: 0;
+  line-height: 1;
+  transition: color .2s;
+}
+
+.remove-skill:hover {
+  color: var(--coral);
+}
+
+.skills-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skill-input-group {
+  display: flex;
+  gap: 6px;
+}
+
+.skill-input-group input {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  color: var(--ink);
+  font-size: 13px;
+  font-family: 'Nunito', sans-serif;
+}
+
+.skill-input-group input:focus {
+  outline: none;
+  border-color: var(--mint);
 }
 
 .empty-note {
