@@ -44,10 +44,10 @@ const staffTabs = adminTabs
 
 const volunteerTabs = [
   { id: 'dashboard',         label: 'Home',         icon: '🏠' },
+  { id: 'volunteer-animals', label: 'Animals',      icon: '🐾' },
   { id: 'shifts',            label: 'My Shifts',    icon: '📅' },
   { id: 'volunteer-tasks',   label: 'Tasks',        icon: '✓' },
   { id: 'supplies',          label: 'Supplies',     icon: '📦' },
-  { id: 'admin-announcements', label: 'News',      icon: '📢' },
   { id: 'volunteer-training', label: 'Training',    icon: '🎓' },
 ]
 

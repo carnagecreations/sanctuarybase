@@ -48,6 +48,7 @@ const routes = [
   { path: '/volunteer-training', name: 'volunteer-training', component: () => import('../components/features/admin/TrainingPage.vue') },
   { path: '/volunteer-profile', name: 'volunteer-profile', component: () => import('../components/features/VolunteerProfile.vue') },
   { path: '/supplies', name: 'supplies', component: () => import('../components/features/SuppliesPage.vue') },
+  { path: '/volunteer-animals', name: 'volunteer-animals', component: () => import('../components/features/VolunteerAnimals.vue') },
   { path: '/volunteer-tasks', name: 'volunteer-tasks', component: () => import('../components/features/VolunteerHub.vue') },
   { path: '/admin/volunteer-hours', name: 'admin-volunteer-hours', component: () => import('../components/features/admin/VolunteerHoursPage.vue') },
   { path: '/admin/compliance', name: 'admin-compliance', component: () => import('../components/features/admin/ComplianceChecklistPage.vue') },
