@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue'
 import { fetchContacts, replyToContact, archiveContact, deleteContact, updateContactStatus } from '../services/contactsService'
+import { playNotificationSound, sendBrowserNotification, showNotification } from '../services/notifications'
 
 // Only these subjects go through the approve/decline pipeline — donations,
 // newsletter signups, and general messages don't have an "application" to
@@ -47,14 +48,26 @@ function mapContact(c) {
 }
 
 export function useContacts() {
-  const loadContacts = async () => {
+  const loadContacts = async (onNewMessages = null) => {
     loading.value = true
     error.value = null
     try {
       const contacts = await fetchContacts()
       const mapped = contacts.map(mapContact).sort((a, b) => b.createdAtMs - a.createdAtMs)
-      submissions.value = mapped.filter(c => !c.archived)
+      const newSubmissions = mapped.filter(c => !c.archived)
+
+      // Detect new unread messages (for notifications)
+      const prevCount = submissions.value.length
+      const newCount = newSubmissions.length
+      const newMessages = newCount > prevCount ? newSubmissions.slice(0, newCount - prevCount) : []
+
+      submissions.value = newSubmissions
       archived.value = mapped.filter(c => c.archived)
+
+      // Trigger callback with new messages for notifications
+      if (newMessages.length > 0 && onNewMessages) {
+        onNewMessages(newMessages)
+      }
     } catch (err) {
       error.value = err.message
       console.error('Failed to load contacts:', err)

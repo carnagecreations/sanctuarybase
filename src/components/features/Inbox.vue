@@ -187,10 +187,13 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { PageContainer, AppButton, EmptyState, AlertBox } from '../ui'
 import { useContacts } from '../../stores/contacts'
+import { useUIStore } from '../../stores/ui'
+import { playNotificationSound, sendBrowserNotification, showNotification, requestNotificationPermission } from '../../services/notifications'
 
+const ui = useUIStore()
 const {
   submissions, archived, loading, error, unreadCount,
   loadContacts, replyToSubmission, archiveSubmission, restoreSubmission, updateSubmissionStatus, deleteSubmission, markInboxSeen
@@ -206,6 +209,7 @@ const seenAtOpen = ref(0)
 const openDetailsId = ref(null)
 const declineId = ref(null)
 const declineReasonDraft = ref('')
+const pollInterval = ref(null)
 
 // Interview/home-check aren't required for every application type, so both
 // lead straight to "approved" as well as to each other.
@@ -266,8 +270,52 @@ const isUnread = (s) => activeTab.value === 'pending' && s.createdAtMs > seenAtO
 
 onMounted(async () => {
   seenAtOpen.value = Number(localStorage.getItem('inbox_last_seen') || 0)
-  await loadContacts()
+
+  // Load messages with notification handler for new arrivals
+  await loadContacts((newMessages) => {
+    if (newMessages.length === 0) return
+
+    // Play sound
+    playNotificationSound()
+
+    // Show toast notification
+    const count = newMessages.length
+    showNotification(ui, `📬 ${count} new message${count !== 1 ? 's' : ''} received`, 'success')
+
+    // Send browser notification
+    const firstMsg = newMessages[0]
+    sendBrowserNotification(`New message from ${firstMsg.name}`, {
+      tag: 'inbox-notification',
+      requireInteraction: false,
+      body: firstMsg.subject || 'New contact form submission'
+    })
+  })
+
   markInboxSeen()
+
+  // Request browser notification permission
+  requestNotificationPermission().catch(() => {})
+
+  // Set up auto-polling every 30 seconds
+  pollInterval.value = setInterval(() => {
+    loadContacts((newMessages) => {
+      if (newMessages.length === 0) return
+      playNotificationSound()
+      showNotification(ui, `📬 ${newMessages.length} new message${newMessages.length !== 1 ? 's' : ''} received`, 'success')
+      const firstMsg = newMessages[0]
+      sendBrowserNotification(`New message from ${firstMsg.name}`, {
+        tag: 'inbox-notification',
+        requireInteraction: false,
+        body: firstMsg.subject || 'New contact form submission'
+      })
+    })
+  }, 30000) // Poll every 30 seconds
+})
+
+onUnmounted(() => {
+  if (pollInterval.value) {
+    clearInterval(pollInterval.value)
+  }
 })
 
 const refresh = async () => {

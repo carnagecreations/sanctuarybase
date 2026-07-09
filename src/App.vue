@@ -30,6 +30,7 @@ import { useAuthStore } from './stores/auth'
 import { useUIStore } from './stores/ui'
 import { useSignupStore } from './stores/signup'
 import { useContacts } from './stores/contacts'
+import { playNotificationSound, sendBrowserNotification, showNotification } from './services/notifications'
 import Header      from './components/layout/Header.vue'
 import BottomNav   from './components/layout/BottomNav.vue'
 import Toast         from './components/shared/Toast.vue'
@@ -69,8 +70,20 @@ const startContactsPolling = () => {
   if (contactsPoll) return
   const role = auth.user?.role
   if (role !== 'admin' && role !== 'staff') return
-  loadContacts()
-  contactsPoll = setInterval(loadContacts, CONTACTS_POLL_MS)
+
+  const handleNewMessages = (newMessages) => {
+    if (newMessages.length === 0) return
+    playNotificationSound()
+    showNotification(ui, `📬 ${newMessages.length} new message${newMessages.length !== 1 ? 's' : ''} received`, 'success')
+    const firstMsg = newMessages[0]
+    sendBrowserNotification(`New message from ${firstMsg.name}`, {
+      tag: 'inbox-notification',
+      body: firstMsg.subject || 'New contact form submission'
+    })
+  }
+
+  loadContacts(handleNewMessages)
+  contactsPoll = setInterval(() => loadContacts(handleNewMessages), CONTACTS_POLL_MS)
 }
 
 const stopContactsPolling = () => {
