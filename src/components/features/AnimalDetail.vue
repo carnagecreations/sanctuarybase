@@ -21,6 +21,7 @@
         <AppButton size="sm" variant="secondary" @click="openPost">📢 Post</AppButton>
         <AppButton size="sm" variant="secondary" @click="openCard">🏷️ Card</AppButton>
         <AppButton size="sm" variant="primary" @click="openVetChat">💬 Vet Chat</AppButton>
+        <AppButton size="sm" variant="secondary" @click="openIncidentReport" class="btn-alert">🚨 Report Incident</AppButton>
       </div>
     </div>
 
@@ -92,6 +93,39 @@
       </template>
     </AppModal>
 
+    <!-- Report Incident Modal -->
+    <AppModal v-if="showIncidentReport" :open="true" title="🚨 Report Incident" size="sm" @close="showIncidentReport = false">
+      <div class="form-group">
+        <label>Incident Type *</label>
+        <AppSelect v-model="incidentForm.type" :options="[
+          { value: 'bite', label: 'Bite' },
+          { value: 'scratch', label: 'Scratch' },
+          { value: 'aggression', label: 'Aggression' },
+          { value: 'injury', label: 'Injury' },
+          { value: 'illness', label: 'Illness' },
+          { value: 'other', label: 'Other' }
+        ]" />
+      </div>
+      <div class="form-group">
+        <label>Victim/Details *</label>
+        <textarea v-model="incidentForm.victim" placeholder="Who/what was involved? (e.g., 'Volunteer Jane', 'Dog in neighboring pen')" rows="2"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Description *</label>
+        <textarea v-model="incidentForm.description" placeholder="What happened? Any injuries, circumstances, or context?" rows="4"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Date & Time</label>
+        <input v-model="incidentForm.datetime" type="datetime-local" />
+      </div>
+      <template #actions>
+        <AppButton @click="showIncidentReport = false">Cancel</AppButton>
+        <AppButton variant="primary" :disabled="!incidentForm.type || !incidentForm.victim || !incidentForm.description || submittingIncident" @click="submitIncidentReport">
+          {{ submittingIncident ? 'Submitting…' : 'Submit Report' }}
+        </AppButton>
+      </template>
+    </AppModal>
+
     <!-- Tabs - Vertical Stack -->
     <div class="tab-menu-wrapper">
       <div class="tab-menu">
@@ -136,6 +170,8 @@ import { PageContainer, AppButton, AppBadge, AppInput, AppSelect, AppModal } fro
 import { useUIStore } from '../../stores/ui'
 import { useAnimalsStore } from '../../stores/animals'
 import { useAnnouncementsStore } from '../../stores/announcements'
+import { useBiteReportsStore } from '../../stores/biteReports'
+import { useAuthStore } from '../../stores/auth'
 
 // Import tab components
 import ProfileTab   from './animal-detail/ProfileTab.vue'
@@ -156,6 +192,7 @@ import SOSTab       from './animal-detail/SOSTab.vue'
 import AssessTab    from './animal-detail/AssessTab.vue'
 
 const ui = useUIStore()
+const auth = useAuthStore()
 const animalsStore = useAnimalsStore()
 const announcementsStore = useAnnouncementsStore()
 const route = useRoute()
@@ -422,6 +459,57 @@ const printKennelCard = () => {
   win.document.close()
 }
 
+/* -------- Incident Reporting -------- */
+const showIncidentReport = ref(false)
+const submittingIncident = ref(false)
+const incidentForm = ref({
+  type: 'bite',
+  victim: '',
+  description: '',
+  datetime: new Date().toISOString().slice(0, 16)
+})
+
+const openIncidentReport = () => {
+  incidentForm.value = {
+    type: 'bite',
+    victim: '',
+    description: '',
+    datetime: new Date().toISOString().slice(0, 16)
+  }
+  showIncidentReport.value = true
+}
+
+const submitIncidentReport = async () => {
+  if (!incidentForm.value.type || !incidentForm.value.victim || !incidentForm.value.description) return
+
+  submittingIncident.value = true
+  try {
+    const biteStore = useBiteReportsStore()
+    const now = new Date(incidentForm.value.datetime || Date.now())
+
+    await biteStore.addBiteReport({
+      animalId: baseAnimal.value?.id,
+      animalName: baseAnimal.value?.name,
+      emoji: baseAnimal.value?.emoji,
+      type: incidentForm.value.type,
+      victim: incidentForm.value.victim,
+      description: incidentForm.value.description,
+      status: 'Pending',
+      reportedAt: now,
+      reportedBy: auth.user?.name || auth.user?.email || 'Anonymous',
+      date: now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    })
+
+    ui.showToast('🚨 Incident report submitted for admin review', 'success')
+    showIncidentReport.value = false
+  } catch (err) {
+    console.error('Failed to submit incident report:', err)
+    ui.showToast('Failed to submit report — please try again', 'error')
+  } finally {
+    submittingIncident.value = false
+  }
+}
+
 // Analytics: track when an animal detail is viewed
 watch(() => baseAnimal.value?.id, (animalId) => {
   if (animalId) {
@@ -607,5 +695,48 @@ watch(() => baseAnimal.value?.id, (animalId) => {
   font-size: 12px;
   color: var(--ink-2);
   line-height: 1.5;
+}
+
+/* Incident report button */
+.btn-alert {
+  border-color: var(--coral) !important;
+  color: var(--coral) !important;
+}
+.btn-alert:hover {
+  background: rgba(255, 107, 107, 0.1);
+  border-color: var(--coral-dark, #ff4444) !important;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  letter-spacing: 0.04em;
+}
+
+.form-group textarea,
+.form-group input,
+.form-group :deep(.select-input) {
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  color: var(--ink);
+  font-size: 13px;
+  font-family: 'Nunito', sans-serif;
+}
+
+.form-group textarea:focus,
+.form-group input:focus {
+  outline: none;
+  border-color: var(--mint);
 }
 </style>
