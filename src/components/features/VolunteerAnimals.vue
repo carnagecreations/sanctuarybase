@@ -12,7 +12,10 @@
     <div v-if="filtered.length > 0" class="animal-grid">
       <AppCard v-for="a in filtered" :key="a.id" class="animal-card" @click="selectedAnimal = a">
         <div class="card-header">
-          <div class="emoji">{{ a.emoji }}</div>
+          <div class="photo-container">
+            <img v-if="a.photos?.length" :src="siteMediaUrl(a.photos[0])" :alt="a.name" class="animal-photo" />
+            <div v-else class="emoji">{{ a.emoji }}</div>
+          </div>
           <div class="info">
             <h3>{{ a.name }}</h3>
             <p class="species">{{ a.species }}<span v-if="a.breed"> · {{ a.breed }}</span></p>
@@ -90,6 +93,7 @@ import { useAnimalsStore } from '../../stores/animals'
 import { useBiteReportsStore } from '../../stores/biteReports'
 import { useUIStore } from '../../stores/ui'
 import { useAuthStore } from '../../stores/auth'
+import { siteMediaUrl } from '../../services/siteApi'
 
 const ui = useUIStore()
 const auth = useAuthStore()
@@ -211,6 +215,25 @@ onMounted(() => {
   align-items: flex-start;
   gap: 12px;
   margin-bottom: 12px;
+}
+
+.photo-container {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.animal-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .emoji {

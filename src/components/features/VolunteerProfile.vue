@@ -51,6 +51,25 @@
           <label>Why I volunteer</label>
           <textarea v-model="draft.why" rows="3" placeholder="What brought you here..."></textarea>
         </div>
+        <div v-if="isVolunteer" class="edit-field">
+          <label>When I'm available</label>
+          <div class="days-selector">
+            <button v-for="d in allDays" :key="d" class="day-btn" :class="{ active: draft.availability.includes(d) }" @click="toggleDay(d)">
+              {{ d }}
+            </button>
+          </div>
+        </div>
+        <div v-if="isVolunteer" class="edit-field">
+          <label>My skills</label>
+          <div class="skill-input-wrapper">
+            <input v-model="skillInput" type="text" placeholder="Add skill, press Enter" @keydown.enter="addSkill" />
+            <div class="skills-list">
+              <span v-for="s in draft.skills" :key="s" class="skill-tag">
+                {{ s }} <button @click="removeSkill(s)">✕</button>
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="edit-actions">
         <AppButton variant="primary" @click="save" :disabled="saving">{{ saving ? 'Saving...' : 'Save' }}</AppButton>
@@ -136,15 +155,37 @@ const joinedDate = computed(() => {
   return d ? new Date(d).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '—'
 })
 
-const draft = ref({ name: '', phone: '', why: '' })
+const draft = ref({ name: '', phone: '', why: '', availability: [], skills: [] })
+const skillInput = ref('')
 
 const startEdit = () => {
   draft.value = {
     name: profile.value?.name || auth.user?.name || '',
     phone: profile.value?.phone || auth.user?.phone || '',
     why: profile.value?.why || '',
+    availability: profile.value?.availability ? [...profile.value.availability] : [],
+    skills: profile.value?.skills ? [...profile.value.skills] : [],
   }
+  skillInput.value = ''
   editing.value = true
+}
+
+const toggleDay = (day) => {
+  const idx = draft.value.availability.indexOf(day)
+  if (idx > -1) draft.value.availability.splice(idx, 1)
+  else draft.value.availability.push(day)
+}
+
+const addSkill = () => {
+  const skill = skillInput.value.trim()
+  if (skill && !draft.value.skills.includes(skill)) {
+    draft.value.skills.push(skill)
+  }
+  skillInput.value = ''
+}
+
+const removeSkill = (skill) => {
+  draft.value.skills = draft.value.skills.filter(s => s !== skill)
 }
 
 const save = async () => {
@@ -154,7 +195,13 @@ const save = async () => {
     await auth.updateProfile({ name: draft.value.name, phone: draft.value.phone })
     // Keep the linked CRM contact (if any) in sync so People/CRM stays accurate.
     if (profile.value?.id) {
-      await peopleStore.updatePerson(profile.value.id, { ...draft.value })
+      await peopleStore.updatePerson(profile.value.id, {
+        name: draft.value.name,
+        phone: draft.value.phone,
+        why: draft.value.why,
+        availability: draft.value.availability,
+        skills: draft.value.skills,
+      })
     }
   } finally {
     saving.value = false
@@ -316,5 +363,88 @@ onMounted(() => peopleStore.fetchPeople())
   font-size: 12px;
   color: var(--ink-3);
   font-style: italic;
+}
+
+.days-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.day-btn {
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--surface-2);
+  color: var(--ink-3);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.day-btn:hover {
+  border-color: var(--ink-2);
+}
+
+.day-btn.active {
+  background: var(--teal-l);
+  border-color: var(--mint);
+  color: var(--mint);
+}
+
+.skill-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skill-input-wrapper input {
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  color: var(--ink);
+  font-size: 13px;
+  font-family: 'Nunito', sans-serif;
+}
+
+.skill-input-wrapper input:focus {
+  outline: none;
+  border-color: var(--mint);
+}
+
+.skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.skill-tag {
+  padding: 5px 10px;
+  border-radius: 20px;
+  background: var(--surface-2);
+  border: 1.5px solid var(--border);
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.skill-tag button {
+  background: none;
+  border: none;
+  color: var(--ink-3);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.skill-tag button:hover {
+  color: var(--ink);
 }
 </style>
