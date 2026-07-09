@@ -4,12 +4,12 @@
 
     <div class="page-header">
       <h1>📢 Announcements</h1>
-      <AppButton v-if="canCreateAnnouncement" variant="primary" @click="showForm = true">+ New announcement</AppButton>
+      <AppButton v-if="isAdmin" variant="primary" @click="showForm = true">+ New announcement</AppButton>
     </div>
 
 
-    <!-- Create announcement form (admin or staff) -->
-    <AppCard v-if="canCreateAnnouncement && showForm" class="form-card">
+    <!-- Create announcement form (admin only) -->
+    <AppCard v-if="isAdmin && showForm" class="form-card">
       <div class="form-header">
         <h2>New Announcement</h2>
         <button class="close-btn" @click="showForm = false">✕</button>
@@ -37,7 +37,7 @@
     <AppCard v-for="a in active" :key="a.id" :flat="true" class="announcement-card">
       <div class="announcement-header">
         <div class="announcement-title">{{ a.title }}</div>
-        <div v-if="canCreateAnnouncement" class="announcement-actions">
+        <div v-if="isAdmin" class="announcement-actions">
           <AppButton size="sm" variant="secondary" @click="deleteAnnouncement(a.id)" :disabled="saving">Delete</AppButton>
         </div>
       </div>
@@ -52,7 +52,7 @@
     <AppCard v-for="a in previous" :key="a.id" :flat="true">
       <div class="announcement-header">
         <div class="announcement-title">{{ a.title }}</div>
-        <div v-if="canCreateAnnouncement" class="announcement-actions">
+        <div v-if="isAdmin" class="announcement-actions">
           <AppButton size="sm" variant="secondary" @click="deleteAnnouncement(a.id)" :disabled="saving">Delete</AppButton>
         </div>
       </div>
@@ -74,7 +74,6 @@ const auth = useAuthStore()
 const announcementsStore = useAnnouncementsStore()
 
 const isAdmin = computed(() => auth.user?.role === 'admin')
-const canCreateAnnouncement = computed(() => auth.user?.role === 'admin' || auth.user?.role === 'staff')
 const showForm = ref(false)
 const saving = ref(false)
 const form = reactive({

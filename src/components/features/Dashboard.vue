@@ -132,7 +132,6 @@
           <span class="avail-label">Skills:</span>
           {{ myProfile.skills.join(', ') }}
         </div>
-        <AppButton size="sm" @click="ui.setCurrentTab('volunteer-profile')" style="margin-top:12px">✏️ Edit profile</AppButton>
       </AppCard>
 
       <SectionLabel>Your upcoming shifts</SectionLabel>

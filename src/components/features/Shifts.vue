@@ -68,6 +68,7 @@
               </div>
               <div class="shift-actions">
                 <AppButton variant="danger" size="sm" @click="clockOut(s)">Clock out</AppButton>
+                <AppButton size="sm" @click="editShift(s)">Edit</AppButton>
               </div>
             </div>
           </div>
@@ -86,6 +87,7 @@
                 <UserRow :name="s.volunteerName" :sub="`${s.role} · ${s.hours}h`" />
                 <div class="shift-times">{{ s.clockIn }} → {{ s.clockOut }}</div>
                 <div class="shift-actions">
+                  <AppButton size="sm" @click="editShift(s)">Edit</AppButton>
                   <AppButton size="sm" variant="danger" @click="deleteShift(s)">Delete</AppButton>
                 </div>
               </div>
@@ -303,6 +305,10 @@ const deleteShift = async (shift) => {
       ui.showToast('Failed to delete shift', 'error')
     }
   }
+}
+
+const editShift = (shift) => {
+  ui.showToast('Edit shift feature coming soon')
 }
 
 const cancelOpenShift = async (shift) => {
