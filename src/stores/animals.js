@@ -72,7 +72,8 @@ export const useAnimalsStore = defineStore('animals', () => {
       }
       return animals.value[idx]
     } catch (error) {
-      return null
+      console.error('Failed to update animal:', error.message)
+      throw error
     } finally {
       loading.value = false
     }

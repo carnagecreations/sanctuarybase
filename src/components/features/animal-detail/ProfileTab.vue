@@ -84,19 +84,19 @@
     <AppCard>
       <div class="note-field">
         <label>Feeding</label>
-        <textarea v-model="draft.feedingNotes" placeholder="Special diet, portions, feeding schedule, restrictions, supplements..." rows="3" @change="save"></textarea>
+        <textarea v-model="draft.feedingNotes" placeholder="Special diet, portions, feeding schedule, restrictions, supplements..." rows="3" @change="saveNotes"></textarea>
       </div>
     </AppCard>
     <AppCard>
       <div class="note-field">
         <label>Behavior</label>
-        <textarea v-model="draft.behaviorNotes" placeholder="Triggers, handling instructions, socialization level, fears..." rows="3" @change="save"></textarea>
+        <textarea v-model="draft.behaviorNotes" placeholder="Triggers, handling instructions, socialization level, fears..." rows="3" @change="saveNotes"></textarea>
       </div>
     </AppCard>
     <AppCard>
       <div class="note-field">
         <label>General notes</label>
-        <textarea v-model="draft.generalNotes" placeholder="Any other relevant information..." rows="3" @change="save"></textarea>
+        <textarea v-model="draft.generalNotes" placeholder="Any other relevant information..." rows="3" @change="saveNotes"></textarea>
       </div>
     </AppCard>
     <div class="notes-save-row">
@@ -190,6 +190,7 @@ const loadVaccines = async () => {
 }
 
 const save = async () => {
+  if (!props.animal?.id) return
   await animalsStore.updateAnimal(props.animal.id, { ...draft })
   editing.value = false
 }
